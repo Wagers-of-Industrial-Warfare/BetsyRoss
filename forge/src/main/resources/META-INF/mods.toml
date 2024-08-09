@@ -1,0 +1,30 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+issueTrackerURL="https://github.com/Wagers-of-Industrial-Warfare/BetsyRoss/issues"
+
+[[mods]]
+modId="betsyross"
+version="${version}"
+displayName="Betsy Ross"
+displayURL="https://github.com/Wagers-of-Industrial-Warfare/BetsyRoss"
+logoFile="icon.png"
+credits="Programmed by rbasamoyai"
+authors="rbasamoyai"
+
+
+description="""Large flags with images across the internets"""
+
+[[dependencies.betsyross]]
+   modId="forge"
+   mandatory=true
+   versionRange="[47,)"
+   ordering="NONE"
+   side="BOTH"
+
+[[dependencies.betsyross]]
+   modId="minecraft"
+   mandatory=true
+   versionRange="[1.20.1,1.21)"
+   ordering="NONE"
+   side="BOTH"

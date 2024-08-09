@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "betsyross",
+  "version": "${version}",
+
+  "name": "Betsy Ross",
+  "description": "Large flags with images across the internets",
+  "authors": [],
+  "contact": {},
+
+  "license": "MIT",
+  "icon": "icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "rbasamoyai.betsyross.fabric.BetsyRossFabric"
+    ]
+  },
+  "mixins": [
+    "betsyross.mixins.json",
+    "betsyross-common.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.7",
+    "minecraft": ">=1.20.1"
+  }
+}
