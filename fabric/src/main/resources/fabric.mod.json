@@ -9,12 +9,15 @@
   "contact": {},
 
   "license": "MIT",
-  "icon": "icon.png",
+  "icon": "logo.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
       "rbasamoyai.betsyross.fabric.BetsyRossFabric"
+    ],
+    "client": [
+      "rbasamoyai.betsyross.fabric.BetsyRossClientFabric"
     ]
   },
   "mixins": [

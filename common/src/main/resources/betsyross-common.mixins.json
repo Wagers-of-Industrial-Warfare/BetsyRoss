@@ -4,8 +4,19 @@
   "package": "rbasamoyai.betsyross.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "ServerGamePacketListenerImplMixin"
   ],
   "client": [
+    "client.ArmorStandRendererMixin",
+    "client.BlockEntityWithoutLevelRendererMixin",
+    "client.ClientPacketListenerMixin",
+    "client.CustomHeadLayerMixin",
+    "client.HumanoidMobRendererMixin",
+    "client.HumanoidModelMixin",
+    "client.IllagerRendererMixin",
+    "client.PlayerRendererMixin",
+    "client.VillagerRendererMixin",
+    "client.WanderingTraderRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
