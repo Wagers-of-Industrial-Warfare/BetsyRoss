@@ -28,3 +28,10 @@ description="""Large flags with images across the internets"""
    versionRange="[1.20.1,1.21)"
    ordering="NONE"
    side="BOTH"
+
+[[dependencies.betsyross]]
+   modId="immersive_paintings"
+   mandatory=true
+   versionRange="[0.6.7,)"
+   ordering="NONE"
+   side="BOTH"

@@ -25,6 +25,8 @@ dependencies {
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
+
+    modImplementation("curse.maven:immersive-paintings-639584:${immersive_paintings_forge_file}")
 }
 
 processResources {
