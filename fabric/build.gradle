@@ -22,6 +22,8 @@ dependencies {
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
 
+    modImplementation("curse.maven:immersive-paintings-639584:${immersive_paintings_fabric_file}")
+
     modApi(include("curse.maven:forge-config-api-port-fabric-547434:${config_api_id}"))
     modApi(include("com.electronwill.night-config:core:${night_config_version}"))
     modApi(include("com.electronwill.night-config:toml:${night_config_version}"))
