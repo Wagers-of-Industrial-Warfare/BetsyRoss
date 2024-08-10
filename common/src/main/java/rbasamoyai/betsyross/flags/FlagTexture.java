@@ -44,18 +44,8 @@ public class FlagTexture extends SimpleTexture {
 
     @Override
     public void load(ResourceManager manager) throws IOException {
-        Minecraft.getInstance().execute(() -> {
-            if (!this.loaded) {
-                try {
-                    super.load(manager);
-                } catch (IOException ioex) {
-                    LOGGER.warn("Failed to load online flag texture: {}", this.url, ioex);
-                }
-                this.loaded = true;
-            }
-        });
-
-        if (this.future != null) return;
+        if (this.future != null)
+            return;
         this.future = CompletableFuture.runAsync(() -> {
             HttpURLConnection connection = null;
             try {

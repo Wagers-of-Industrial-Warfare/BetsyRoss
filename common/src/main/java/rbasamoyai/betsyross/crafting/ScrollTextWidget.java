@@ -36,7 +36,7 @@ public class ScrollTextWidget extends AbstractWidget {
 
 	@Override
 	public boolean mouseScrolled(double pMouseX, double pMouseY, double pDelta) {
-		if (this.isHoveredOrFocused()) {
+		if (this.isHovered()) {
 			this.value = (byte) Mth.clamp((float) this.value + pDelta, (float) this.minValue, (float) maxValue);
 			return true;
 		}

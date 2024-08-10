@@ -1,5 +1,6 @@
 package rbasamoyai.betsyross.flags;
 
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -37,7 +38,8 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 	public void render(FlagBlockEntity flag, float partialTicks, PoseStack stack, MultiBufferSource buffers, int packedLight, int packedOverlay) {
 		int w = flag.getFlagWidth();
 		int h = flag.getFlagHeight();
-		if (w <= 0 || h <= 0) return;
+		if (w <= 0 || h <= 0)
+            return;
 		String url = flag.getFlagUrl();
 		BlockState state = flag.getBlockState();
 
@@ -72,7 +74,9 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 		stack.popPose();
 	}
 
-	public static void renderFullTexture(BlockState state, String url, int width, int height, float partialTicks, float dir, PoseStack stack, MultiBufferSource buffers, int packedLight, int packedOverlay, boolean flip, FlagAnimationDetail detail, boolean isItem) {
+	public static void renderFullTexture(BlockState state, String url, int width, int height, float partialTicks, float dir,
+                                         PoseStack stack, MultiBufferSource buffers, int packedLight, int packedOverlay,
+                                         boolean flip, FlagAnimationDetail detail, boolean isItem) {
 		if (width <= 0 || height <= 0) return;
 		stack.pushPose();
 
@@ -110,13 +114,14 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 		}
 
 		Matrix4f pose = stack.last().pose();
+        Matrix3f normal = isItem ? new Matrix3f() : stack.last().normal();
 
 		vcons.vertex(pose, 0, 0, 0)
 				.color(255, 255, 255, 255)
 				.uv(flip ? 0 : 1, 0)
 				.overlayCoords(overlay)
 				.uv2(light)
-				.normal(nx, ny, nz)
+				.normal(normal, nx, ny, nz)
 				.endVertex();
 
 		vcons.vertex(pose, 0, h, 0)
@@ -124,7 +129,7 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 				.uv(flip ? 0 : 1, 1)
 				.overlayCoords(overlay)
 				.uv2(light)
-				.normal(nx, ny, nz)
+				.normal(normal, nx, ny, nz)
 				.endVertex();
 
 		vcons.vertex(pose, w, h, 0)
@@ -132,7 +137,7 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 				.uv(flip ? 1 : 0, 1)
 				.overlayCoords(overlay)
 				.uv2(light)
-				.normal(nx, ny, nz)
+				.normal(normal, nx, ny, nz)
 				.endVertex();
 
 		vcons.vertex(pose, w, 0, 0)
@@ -140,11 +145,12 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 				.uv(flip ? 1 : 0, 0)
 				.overlayCoords(overlay)
 				.uv2(light)
-				.normal(nx, ny, nz)
+				.normal(normal, nx, ny, nz)
 				.endVertex();
 	}
 
-	private static void renderWaveSimple(VertexConsumer vcons, PoseStack stack, float partialTicks, float w, float h, int light, int overlay, boolean flip) {
+	private static void renderWaveSimple(VertexConsumer vcons, PoseStack stack, float partialTicks, float w, float h,
+                                         int light, int overlay, boolean flip) {
 		Minecraft mc = Minecraft.getInstance();
 
 		float sample = 1;
@@ -155,22 +161,25 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 
 		float[] horizDisp = new float[sz];
 		float sampleRec = 1 / sample;
-		for (int i = 0; i < sz; ++i) {
+		for (int i = 0; i < sz; ++i)
 			horizDisp[i] = Mth.sin(freq * (i * sampleRec - phaseOffs)) * coAmp * i * sampleRec;
-		}
 
 		Vector3f[] normals = new Vector3f[sz];
 		for (int i = 0 ; i < sz; ++i) {
-			if (i == 0) normals[i] = new Vector3f(sampleRec, 0, i + 1 == sz ? 0 : -horizDisp[i]).normalize(); // 90 deg rotation ccw
-			else if (i + 1 == sz) normals[i] = new Vector3f(sampleRec, 0, horizDisp[i]).normalize(); // 90 deg rotation cw
-			else { // https://math.stackexchange.com/a/2285989 for algorithm
+			if (i == 0) {
+                normals[i] = new Vector3f(sampleRec, 0, i + 1 == sz ? 0 : -horizDisp[i]).normalize(); // 90 deg rotation ccw
+            } else if (i + 1 == sz) {
+                normals[i] = new Vector3f(sampleRec, 0, horizDisp[i]).normalize(); // 90 deg rotation cw
+            } else { // https://math.stackexchange.com/a/2285989 for algorithm
 				Vector3f vec1 = new Vector3f(horizDisp[i - 1], 0, -sampleRec);
 				float len1 = vec1.length();
 				Vector3f vec2 = new Vector3f(horizDisp[i + 1], 0, sampleRec);
 				float len2 = vec2.length();
 				Vector3f vec3 = vec1.mul(len2).add(vec2.mul(len1));
-				if (vec3.lengthSquared() <= 1e-4d) vec3 = new Vector3f(sampleRec, 0, -horizDisp[i]);
-				if (!flip) vec3.mul(-1);
+				if (vec3.lengthSquared() <= 1e-4d)
+                    vec3 = new Vector3f(sampleRec, 0, -horizDisp[i]);
+				if (!flip)
+                    vec3.mul(-1);
 				normals[i] = vec3.normalize();
 			}
 		}
@@ -183,26 +192,31 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 		}
 
 		Matrix4f pose = stack.last().pose();
+        Matrix3f normal = stack.last().normal();
 
 		float f = sz <= 2 ? 1 : 1f / (sz - 1);
 		float ulen = w * f;
 		for (int i = 0; i < sz - 1; ++i) {
-			Vector3f n1 = normals[i];
-			Vector3f n2 = normals[i + 1];
+            int index = flip ? i : sz - i - 1;
+            int nextIndex = flip ? i + 1 : sz - i - 2;
+            Vector3f n1 = normals[index];
+            Vector3f n2 = normals[nextIndex];
+			//n1 = new Vector3f(0, 0, flip ? 1 : -1);
+			//n2 = new Vector3f(0, 0, flip ? 1 : -1);
 
 			float u1 = flip ? 0 + i * f : 1 - i * f;
 			float u2 = flip ? u1 + f : u1 - f;
 			float w1 = flip ? ulen * i : ulen * -i;
 			float w2 = flip ? w1 + ulen : w1 - ulen;
-			float z1 = horizDisp[flip ? i : sz - i - 1];
-			float z2 = horizDisp[flip ? i + 1 : sz - i - 2];
+			float z1 = horizDisp[index];
+			float z2 = horizDisp[nextIndex];
 
 			vcons.vertex(pose, w1, 0, z1)
 					.color(255, 255, 255, 255)
 					.uv(u1, 0)
 					.overlayCoords(overlay)
 					.uv2(light)
-					.normal(n1.x, n1.y, n1.z)
+					.normal(normal, n1.x, n1.y, n1.z)
 					.endVertex();
 
 			vcons.vertex(pose, w1, h, z1)
@@ -210,7 +224,7 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 					.uv(u1, 1)
 					.overlayCoords(overlay)
 					.uv2(light)
-					.normal(n1.x, n1.y, n1.z)
+					.normal(normal, n1.x, n1.y, n1.z)
 					.endVertex();
 
 			vcons.vertex(pose, w2, h, z2)
@@ -218,7 +232,7 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 					.uv(u2, 1)
 					.overlayCoords(overlay)
 					.uv2(light)
-					.normal(n2.x, n2.y, n2.z)
+					.normal(normal, n2.x, n2.y, n2.z)
 					.endVertex();
 
 			vcons.vertex(pose, w2, 0, z2)
@@ -226,7 +240,7 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 					.uv(u2, 0)
 					.overlayCoords(overlay)
 					.uv2(light)
-					.normal(n2.x, n2.y, n2.z)
+					.normal(normal, n2.x, n2.y, n2.z)
 					.endVertex();
 		}
 	}
