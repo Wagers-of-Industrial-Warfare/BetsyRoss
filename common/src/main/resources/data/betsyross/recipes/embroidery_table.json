@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "B": { "tag": "minecraft:banners" },
+    "P": { "tag": "minecraft:planks"}
+  },
+  "pattern": [
+    "BB",
+    "PP",
+    "PP"
+  ],
+  "result": {
+    "item": "betsyross:embroidery_table"
+  }
+}
