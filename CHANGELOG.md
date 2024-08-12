@@ -4,7 +4,7 @@
 ---
 
 **Added**
-- Added Curios support for the Armor Banner
+- Added Curios (Forge/NeoForge) and Trinkets (Fabric) support for the Armor Banner
 
 **Changed**
 - Betsy Ross now depends on Immersive Paintings
