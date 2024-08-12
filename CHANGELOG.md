@@ -3,6 +3,9 @@
 2.0.0
 ---
 
+**Added**
+- Added Curios support for the Armor Banner
+
 **Changed**
 - Betsy Ross now depends on Immersive Paintings
   - This will break old paintings.

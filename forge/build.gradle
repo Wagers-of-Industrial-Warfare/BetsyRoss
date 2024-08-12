@@ -20,6 +20,10 @@ configurations {
     developmentForge.extendsFrom common
 }
 
+repositories {
+    maven { url = "https://maven.theillusivec4.top/" } // Curios
+}
+
 dependencies {
     forge "net.minecraftforge:forge:${forge_version}"
 
@@ -28,15 +32,24 @@ dependencies {
 
     modImplementation("curse.maven:immersive-paintings-639584:${immersive_paintings_forge_file}")
 
+    // Curios
+    modRuntimeOnly("top.theillusivec4.curios:curios-forge:${curios_forge_version}")
+    modCompileOnly("top.theillusivec4.curios:curios-forge:${curios_forge_version}:api")
+
     compileOnly("io.github.llamalad7:mixinextras-common:${mixinextras_version}")
     annotationProcessor(implementation(include("io.github.llamalad7:mixinextras-forge:${mixinextras_version}")))
 }
 
 processResources {
-    inputs.property "version", project.version
+    Map<String, String> properties = Map.of(
+        "version", project.version,
+        "immersive_paintings_requirement", immersive_paintings_forge_requirement,
+        "curios_requirement", curios_requirement
+    )
+    inputs.properties properties
 
     filesMatching("META-INF/mods.toml") {
-        expand "version": project.version
+        expand properties
     }
 }
 
