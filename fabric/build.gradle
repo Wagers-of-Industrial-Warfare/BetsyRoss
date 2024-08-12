@@ -15,6 +15,11 @@ configurations {
     developmentFabric.extendsFrom common
 }
 
+repositories {
+    maven { url = "https://maven.terraformersmc.com/releases/" } // Trinkets
+    maven { url = "https://maven.ladysnake.org/releases" } // CCA
+}
+
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
@@ -28,14 +33,25 @@ dependencies {
     modApi(include("com.electronwill.night-config:core:${night_config_version}"))
     modApi(include("com.electronwill.night-config:toml:${night_config_version}"))
 
+    // Trinkets and CCA
+    modLocalRuntime("dev.emi:trinkets:${trinkets_fabric_version}")
+    modCompileOnly("dev.emi:trinkets:${trinkets_fabric_version}") { exclude(group: "com.terraformersmc") }
+    modCompileOnly("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${cca_fabric_version}")
+    modCompileOnly("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${cca_fabric_version}")
+
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
 }
 
 processResources {
-    inputs.property "version", project.version
+    def properties = [
+        version: project.version,
+        immersive_paintings_requirement: immersive_paintings_fabric_requirement,
+        trinkets_breaking: trinkets_requirement
+    ]
+    inputs.properties properties
 
     filesMatching("fabric.mod.json") {
-        expand "version": project.version
+        expand properties
     }
 }
 
