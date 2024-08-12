@@ -13,7 +13,7 @@ public class BetsyRossCreativeModeTab {
     public static void create(BiConsumer<ResourceLocation, CreativeModeTab> cons) {
         CreativeModeTab tab = tabBuilder()
             .title(Component.translatable("itemGroup." + BetsyRoss.MOD_ID))
-            .icon(() -> BetsyRossItems.FLAG_ITEM.get().getLogoStack())
+            .icon(() -> BetsyRossItems.FLAG_ITEM.get().getDefaultInstance())
             .displayItems((param, output) -> {
                 output.accept(BetsyRossItems.EMBROIDERY_TABLE_ITEM.get().getDefaultInstance());
                 output.accept(BetsyRossItems.FLAG_ITEM.get().getDefaultInstance());

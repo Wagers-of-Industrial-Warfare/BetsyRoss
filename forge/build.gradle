@@ -27,6 +27,9 @@ dependencies {
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 
     modImplementation("curse.maven:immersive-paintings-639584:${immersive_paintings_forge_file}")
+
+    compileOnly("io.github.llamalad7:mixinextras-common:${mixinextras_version}")
+    annotationProcessor(implementation(include("io.github.llamalad7:mixinextras-forge:${mixinextras_version}")))
 }
 
 processResources {

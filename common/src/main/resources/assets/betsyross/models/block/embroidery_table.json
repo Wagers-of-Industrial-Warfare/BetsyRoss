@@ -5,7 +5,6 @@
 		"0": "betsyross:block/embroidery_table",
 		"particle": "betsyross:block/embroidery_table"
 	},
-	"render_type": "cutout",
 	"elements": [
 		{
 			"from": [1, 0, 1],

@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.IllagerRenderer;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.world.entity.monster.AbstractIllager;
-import rbasamoyai.betsyross.flags.ArmorBannerLayer;
+import rbasamoyai.betsyross.flags.standards.ArmorBannerLayer;
 
 @Mixin(IllagerRenderer.class)
 public abstract class IllagerRendererMixin<T extends AbstractIllager> extends MobRenderer<T, IllagerModel<T>> {
