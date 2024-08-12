@@ -1,16 +1,13 @@
 package rbasamoyai.betsyross.crafting;
 
-import javax.annotation.Nullable;
-
+import immersive_paintings.Config;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -21,7 +18,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import rbasamoyai.betsyross.content.BetsyRossItems;
 import rbasamoyai.betsyross.content.BetsyRossStats;
+import rbasamoyai.betsyross.network.BetsyRossNetwork;
+import rbasamoyai.betsyross.network.ClientboundOpenEmbroideryTableScreenPacket;
 
 public class EmbroideryTableBlock extends Block {
 
@@ -36,19 +36,23 @@ public class EmbroideryTableBlock extends Block {
 
 	@Override
 	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
-		if (!level.isClientSide && player instanceof ServerPlayer splayer) {
-            splayer.openMenu(state.getMenuProvider(level, pos));
-			player.awardStat(BetsyRossStats.INTERACT_WITH_EMBROIDERY_TABLE);
+		if (hand == InteractionHand.MAIN_HAND) {
+            ItemStack itemStack = player.getItemInHand(hand);
+            if (isValidEmbroideryTableItem(itemStack)) {
+                if (player instanceof ServerPlayer splayer) {
+                    Config config = Config.getInstance();
+                    BetsyRossNetwork.sendToPlayer(splayer, new ClientboundOpenEmbroideryTableScreenPacket(player.getInventory().selected,
+                        config.minPaintingResolution, config.maxPaintingResolution, config.showOtherPlayersPaintings, config.uploadPermissionLevel));
+                    player.awardStat(BetsyRossStats.INTERACT_WITH_EMBROIDERY_TABLE);
+                }
+            } else if (isInvalidFlagItem(itemStack)) {
+                player.displayClientMessage(Component.translatable("gui.betsyross.embroidery_table.invalid_flag"), true);
+            } else {
+                player.displayClientMessage(Component.translatable("gui.betsyross.embroidery_table.invalid_item"), true);
+            }
+            return InteractionResult.sidedSuccess(level.isClientSide);
 		}
-		return InteractionResult.sidedSuccess(level.isClientSide);
-	}
-
-	@Nullable
-	@Override
-	public MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
-		return new SimpleMenuProvider((windowId, playerInv, player) -> {
-			return new EmbroideryTableMenu(windowId, playerInv, ContainerLevelAccess.create(level, pos));
-		}, Component.translatable(this.getDescriptionId()));
+        return super.use(state, level, pos, player, hand, result);
 	}
 
 	public static Properties properties() {
@@ -59,5 +63,17 @@ public class EmbroideryTableBlock extends Block {
 	public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
 		return SHAPE;
 	}
+
+    public static boolean isValidEmbroideryTableItem(ItemStack itemStack) {
+        if (itemStack.is(BetsyRossItems.FLAG_STANDARD.get()))
+            return true;
+        if (itemStack.is(BetsyRossItems.BANNER_STANDARD.get()))
+            return true;
+        return itemStack.is(BetsyRossItems.ARMOR_BANNER.get());
+    }
+
+    public static boolean isInvalidFlagItem(ItemStack itemStack) {
+        return itemStack.is(BetsyRossItems.FLAG_ITEM.get());
+    }
 
 }

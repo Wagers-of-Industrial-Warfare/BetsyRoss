@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.world.entity.Mob;
-import rbasamoyai.betsyross.flags.ArmorBannerLayer;
+import rbasamoyai.betsyross.flags.standards.ArmorBannerLayer;
 
 @Mixin(HumanoidMobRenderer.class)
 public abstract class HumanoidMobRendererMixin<T extends Mob, M extends HumanoidModel<T>> extends LivingEntityRenderer<T, M> {

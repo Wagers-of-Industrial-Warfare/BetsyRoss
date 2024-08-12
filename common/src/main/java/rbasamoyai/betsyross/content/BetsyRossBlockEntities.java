@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import rbasamoyai.betsyross.BetsyRoss;
-import rbasamoyai.betsyross.flags.FlagBlockEntity;
+import rbasamoyai.betsyross.flags.flag_block.FlagBlockEntity;
 import rbasamoyai.betsyross.foundation.ObjectHolder;
 
 public class BetsyRossBlockEntities {

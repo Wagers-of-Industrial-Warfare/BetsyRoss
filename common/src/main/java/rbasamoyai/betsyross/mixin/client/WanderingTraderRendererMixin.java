@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.WanderingTraderRenderer;
 import net.minecraft.world.entity.npc.WanderingTrader;
-import rbasamoyai.betsyross.flags.ArmorBannerLayer;
+import rbasamoyai.betsyross.flags.standards.ArmorBannerLayer;
 
 @Mixin(WanderingTraderRenderer.class)
 public abstract class WanderingTraderRendererMixin extends MobRenderer<WanderingTrader, VillagerModel<WanderingTrader>> {

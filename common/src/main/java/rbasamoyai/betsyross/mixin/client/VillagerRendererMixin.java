@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.VillagerRenderer;
 import net.minecraft.world.entity.npc.Villager;
-import rbasamoyai.betsyross.flags.ArmorBannerLayer;
+import rbasamoyai.betsyross.flags.standards.ArmorBannerLayer;
 
 @Mixin(VillagerRenderer.class)
 public abstract class VillagerRendererMixin extends MobRenderer<Villager, VillagerModel<Villager>> {

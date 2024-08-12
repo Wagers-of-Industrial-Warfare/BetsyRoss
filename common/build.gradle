@@ -13,6 +13,8 @@ dependencies {
     modApi("curse.maven:forge-config-api-port-fabric-547434:${config_api_id}")
     modImplementation("curse.maven:immersive-paintings-639584:${immersive_paintings_fabric_file}")
 
+    annotationProcessor(implementation("io.github.llamalad7:mixinextras-common:${mixinextras_version}")) // MixinExtras
+
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
 }
 

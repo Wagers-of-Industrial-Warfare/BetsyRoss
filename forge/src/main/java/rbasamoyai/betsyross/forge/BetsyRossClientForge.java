@@ -1,6 +1,8 @@
 package rbasamoyai.betsyross.forge;
 
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import rbasamoyai.betsyross.BetsyRossClient;
@@ -11,10 +13,13 @@ public class BetsyRossClientForge {
         modBus.addListener(BetsyRossClientForge::onClientSetup);
         modBus.addListener(BetsyRossClientForge::onRendererRegistry);
         modBus.addListener(BetsyRossClientForge::onRegisterModelLayers);
+        modBus.addListener(BetsyRossClientForge::onRegisterModelBakery);
     }
 
     public static void onClientSetup(FMLClientSetupEvent evt) {
-        evt.enqueueWork(BetsyRossClient::init);
+        evt.enqueueWork(() -> {
+            BetsyRossClient.init(ItemBlockRenderTypes::setRenderLayer);
+        });
     }
 
     public static void onRendererRegistry(EntityRenderersEvent.RegisterRenderers evt) {
@@ -23,6 +28,10 @@ public class BetsyRossClientForge {
 
     public static void onRegisterModelLayers(EntityRenderersEvent.RegisterLayerDefinitions evt) {
         BetsyRossClient.registerLayerDefinitions(evt::registerLayerDefinition);
+    }
+
+    public static void onRegisterModelBakery(ModelEvent.RegisterAdditional evt) {
+        BetsyRossClient.registerModels(evt::register);
     }
 
 }

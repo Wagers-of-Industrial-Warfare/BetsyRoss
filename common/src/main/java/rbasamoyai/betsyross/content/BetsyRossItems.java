@@ -9,10 +9,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import rbasamoyai.betsyross.BetsyRoss;
-import rbasamoyai.betsyross.flags.ArmorBannerItem;
-import rbasamoyai.betsyross.flags.BannerStandardItem;
-import rbasamoyai.betsyross.flags.FlagBlockItem;
-import rbasamoyai.betsyross.flags.FlagStandardItem;
+import rbasamoyai.betsyross.flags.flag_block.FlagBlockItem;
+import rbasamoyai.betsyross.flags.standards.ArmorBannerItem;
+import rbasamoyai.betsyross.flags.standards.StandardItem;
 import rbasamoyai.betsyross.foundation.ObjectHolder;
 
 public class BetsyRossItems {
@@ -20,11 +19,12 @@ public class BetsyRossItems {
     private static final Map<String, Supplier<? extends Item>> ENTRIES = new LinkedHashMap<>();
 
     public static final Supplier<FlagBlockItem> FLAG_ITEM = register("flag_block",
-        () -> new FlagBlockItem(BetsyRossBlocks.FLAG_BLOCK.get(), BetsyRossBlocks.DRAPED_FLAG_BLOCK.get(), new Item.Properties().stacksTo(1)));
-    public static final Supplier<FlagStandardItem> FLAG_STANDARD = register("flag_standard",
-        () -> new FlagStandardItem(new Item.Properties().stacksTo(1)));
-    public static final Supplier<BannerStandardItem> BANNER_STANDARD = register("banner_standard",
-        () -> new BannerStandardItem(new Item.Properties().stacksTo(1)));
+        () -> new FlagBlockItem(BetsyRossBlocks.FLAG_BLOCK.get(), BetsyRossBlocks.DRAPED_FLAG_BLOCK.get(),
+            new Item.Properties()));
+    public static final Supplier<StandardItem> FLAG_STANDARD = register("flag_standard",
+        () -> new StandardItem(new Item.Properties().stacksTo(1)));
+    public static final Supplier<StandardItem> BANNER_STANDARD = register("banner_standard",
+        () -> new StandardItem(new Item.Properties().stacksTo(1)));
     public static final Supplier<ArmorBannerItem> ARMOR_BANNER = register("armor_banner",
         () -> new ArmorBannerItem(new Item.Properties().stacksTo(1)));
     public static final Supplier<BlockItem> EMBROIDERY_TABLE_ITEM = register("embroidery_table",

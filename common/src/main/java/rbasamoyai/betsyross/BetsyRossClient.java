@@ -3,45 +3,38 @@ package rbasamoyai.betsyross;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import immersive_paintings.resources.ClientPaintingManager;
+import immersive_paintings.resources.Painting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.item.ItemPropertyFunction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import rbasamoyai.betsyross.content.BetsyRossBlockEntities;
+import rbasamoyai.betsyross.content.BetsyRossBlocks;
 import rbasamoyai.betsyross.content.BetsyRossItems;
-import rbasamoyai.betsyross.content.BetsyRossMenus;
-import rbasamoyai.betsyross.crafting.EmbroideryTableScreen;
-import rbasamoyai.betsyross.flags.ArmorBannerRenderer;
-import rbasamoyai.betsyross.flags.BannerStandardRenderer;
-import rbasamoyai.betsyross.flags.FlagBlockEntityRenderer;
-import rbasamoyai.betsyross.flags.FlagItemRenderer;
-import rbasamoyai.betsyross.flags.FlagStandardRenderer;
+import rbasamoyai.betsyross.flags.flag_block.FlagBlockEntityRenderer;
+import rbasamoyai.betsyross.flags.standards.ArmorBannerRenderer;
+import rbasamoyai.betsyross.flags.standards.BannerStandardRenderer;
+import rbasamoyai.betsyross.flags.standards.FlagStandardRenderer;
 import rbasamoyai.betsyross.network.BetsyRossNetwork;
 import rbasamoyai.betsyross.network.CommonPacket;
 
 public class BetsyRossClient {
-
-    private static BlockEntityWithoutLevelRenderer FLAG_ITEM_RENDERER;
-    public static BlockEntityWithoutLevelRenderer getFlagItemRenderer() {
-        if (FLAG_ITEM_RENDERER == null) {
-            Minecraft mc = Minecraft.getInstance();
-            FLAG_ITEM_RENDERER = new FlagItemRenderer(mc.getBlockEntityRenderDispatcher(), mc.getEntityModels());
-        }
-        return FLAG_ITEM_RENDERER;
-    }
 
     private static BlockEntityWithoutLevelRenderer FLAG_STANDARD_RENDERER;
     public static BlockEntityWithoutLevelRenderer getFlagStandardRenderer() {
@@ -82,12 +75,24 @@ public class BetsyRossClient {
         return loc;
     }
 
-    public static void init() {
-        MenuScreens.register(BetsyRossMenus.EMBROIDERY_TABLE_MENU.get(), EmbroideryTableScreen::new);
-
+    public static void init(BiConsumer<Block, RenderType> layerRegistration) {
         registerItemProperty(BetsyRossItems.BANNER_STANDARD.get(), BetsyRoss.path("raised"), (stack, level, entity, seed) -> {
             return entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1 : 0;
         });
+
+        layerRegistration.accept(BetsyRossBlocks.EMBROIDERY_TABLE_BLOCK.get(), RenderType.cutout());
+    }
+
+    public static final ResourceLocation SPECIAL_ARMOR_BANNER_MODEL = BetsyRoss.path("item/special_armor_banner");
+    public static final ResourceLocation SPECIAL_BANNER_STANDARD_MODEL = BetsyRoss.path("item/special_banner_standard");
+    public static final ResourceLocation SPECIAL_BANNER_STANDARD_RAISED_MODEL = BetsyRoss.path("item/special_banner_standard_raised");
+    public static final ResourceLocation SPECIAL_FLAG_STANDARD_MODEL = BetsyRoss.path("item/special_flag_standard");
+
+    public static void registerModels(Consumer<ResourceLocation> cons) {
+        cons.accept(SPECIAL_ARMOR_BANNER_MODEL);
+        cons.accept(SPECIAL_BANNER_STANDARD_MODEL);
+        cons.accept(SPECIAL_BANNER_STANDARD_RAISED_MODEL);
+        cons.accept(SPECIAL_FLAG_STANDARD_MODEL);
     }
 
     @ExpectPlatform
@@ -114,10 +119,6 @@ public class BetsyRossClient {
 
     public static boolean renderCustomItem(BlockEntityWithoutLevelRenderer original, ItemStack stack, ItemDisplayContext transform,
                                            PoseStack poseStack, MultiBufferSource buffers, int light, int overlay) {
-        if (stack.is(BetsyRossItems.FLAG_ITEM.get()) && original != getFlagItemRenderer()) {
-            getFlagItemRenderer().renderByItem(stack, transform, poseStack, buffers, light, overlay);
-            return true;
-        }
         if (stack.is(BetsyRossItems.FLAG_STANDARD.get()) && original != getFlagStandardRenderer()) {
             getFlagStandardRenderer().renderByItem(stack, transform, poseStack, buffers, light, overlay);
             return true;
@@ -131,6 +132,18 @@ public class BetsyRossClient {
             return true;
         }
         return false;
+    }
+
+    public static FlagRenderInfo getFlagRenderInfo(ResourceLocation location) {
+        Painting painting = ClientPaintingManager.getPaintings().get(location);
+        if (painting == null) {
+            painting = ClientPaintingManager.getPainting(BetsyRoss.DEFAULT_FLAG);
+            location = BetsyRoss.DEFAULT_FLAG;
+        }
+        return new FlagRenderInfo(location, painting.width, painting.height);
+    }
+
+    public record FlagRenderInfo(ResourceLocation location, int width, int height) {
     }
 
 }

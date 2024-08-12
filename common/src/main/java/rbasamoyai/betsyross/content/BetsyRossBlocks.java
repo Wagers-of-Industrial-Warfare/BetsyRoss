@@ -9,8 +9,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import rbasamoyai.betsyross.BetsyRoss;
 import rbasamoyai.betsyross.crafting.EmbroideryTableBlock;
-import rbasamoyai.betsyross.flags.DrapedFlagBlock;
-import rbasamoyai.betsyross.flags.FlagBlock;
+import rbasamoyai.betsyross.flags.flag_block.DrapedFlagBlock;
+import rbasamoyai.betsyross.flags.flag_block.FlagBlock;
 import rbasamoyai.betsyross.foundation.ObjectHolder;
 
 public class BetsyRossBlocks {

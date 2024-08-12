@@ -18,7 +18,6 @@ import rbasamoyai.betsyross.content.BetsyRossBlockEntities;
 import rbasamoyai.betsyross.content.BetsyRossBlocks;
 import rbasamoyai.betsyross.content.BetsyRossCreativeModeTab;
 import rbasamoyai.betsyross.content.BetsyRossItems;
-import rbasamoyai.betsyross.content.BetsyRossMenus;
 import rbasamoyai.betsyross.content.BetsyRossStats;
 import rbasamoyai.betsyross.network.BetsyRossNetwork;
 
@@ -31,7 +30,6 @@ public class BetsyRossFabric implements ModInitializer {
         BetsyRossBlocks.registerAll(registerConsumer(BuiltInRegistries.BLOCK));
         BetsyRossItems.registerAll(registerConsumer(BuiltInRegistries.ITEM));
         BetsyRossBlockEntities.registerAll(registerConsumer(BuiltInRegistries.BLOCK_ENTITY_TYPE));
-        BetsyRossMenus.registerAll(registerConsumer(BuiltInRegistries.MENU));
         BetsyRossCreativeModeTab.create(registerConsumer(BuiltInRegistries.CREATIVE_MODE_TAB));
         BetsyRossStats.registerAll(registerConsumer(BuiltInRegistries.CUSTOM_STAT));
 

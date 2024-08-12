@@ -23,7 +23,10 @@ public class BetsyRossNetwork {
 
     public static void init() {
         PACKETS_BY_ID.put(ClientboundCheckChannelVersionPacket.ID, ClientboundCheckChannelVersionPacket::new);
-        PACKETS_BY_ID.put(ServerboundSyncTableDataPacket.ID, ServerboundSyncTableDataPacket::new);
+        PACKETS_BY_ID.put(ClientboundOpenEmbroideryTableScreenPacket.ID, ClientboundOpenEmbroideryTableScreenPacket::new);
+        PACKETS_BY_ID.put(ClientboundOpenFlagBlockScreenPacket.ID, ClientboundOpenFlagBlockScreenPacket::new);
+        PACKETS_BY_ID.put(ServerboundModifyFlagBlockPacket.ID, ServerboundModifyFlagBlockPacket::new);
+        PACKETS_BY_ID.put(ServerboundSyncEmbroideryTableDataPacket.ID, ServerboundSyncEmbroideryTableDataPacket::new);
     }
 
 	public static void sendToServer(Consumer<Packet<?>> listener, CommonPacket packet) {
@@ -35,7 +38,7 @@ public class BetsyRossNetwork {
     public static void sendToPlayer(ServerPlayer player, CommonPacket packet) {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         packet.encode(buf);
-        player.connection.send(new ClientboundCustomPayloadPacket(buf.readResourceLocation(), buf));
+        player.connection.send(new ClientboundCustomPayloadPacket(packet.name(), buf));
     }
 
     @Nullable

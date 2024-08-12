@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "B": { "tag": "minecraft:banners" },
+    "S": { "tag": "betsyross:flag_stick_material"},
+    "T": { "item": "minecraft:string"}
+  },
+  "pattern": [
+    " B ",
+    "TST"
+  ],
+  "result": {
+    "item": "betsyross:armor_banner"
+  }
+}

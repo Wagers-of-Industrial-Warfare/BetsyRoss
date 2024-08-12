@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "B": { "tag": "minecraft:banners" }
+  },
+  "pattern": [
+    "BB"
+  ],
+  "result": {
+    "item": "betsyross:flag_block"
+  }
+}

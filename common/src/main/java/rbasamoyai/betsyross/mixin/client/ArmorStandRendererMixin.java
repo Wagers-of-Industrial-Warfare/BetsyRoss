@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.entity.ArmorStandRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.world.entity.decoration.ArmorStand;
-import rbasamoyai.betsyross.flags.ArmorBannerLayer;
+import rbasamoyai.betsyross.flags.standards.ArmorBannerLayer;
 
 @Mixin(ArmorStandRenderer.class)
 public abstract class ArmorStandRendererMixin extends LivingEntityRenderer<ArmorStand, ArmorStandArmorModel> {

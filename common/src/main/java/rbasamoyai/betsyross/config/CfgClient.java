@@ -3,7 +3,7 @@ package rbasamoyai.betsyross.config;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import rbasamoyai.betsyross.BetsyRoss;
-import rbasamoyai.betsyross.flags.FlagAnimationDetail;
+import rbasamoyai.betsyross.flags.flag_block.FlagAnimationDetail;
 
 public class CfgClient {
 

@@ -23,7 +23,9 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
         CommonPacket cpacket = BetsyRossNetwork.constructCommonPacket(packet.getIdentifier(), packet.getData());
         if (cpacket == null)
             return;
-        cpacket.handle(this.getPlayer().getServer(), this, this.getPlayer());
+        this.getPlayer().getServer().execute(() -> {
+            cpacket.handle(this.getPlayer().getServer(), this, this.getPlayer());
+        });
         if (ci.isCancellable())
             ci.cancel();
     }

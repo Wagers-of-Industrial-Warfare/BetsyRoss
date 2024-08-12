@@ -24,7 +24,6 @@ import rbasamoyai.betsyross.content.BetsyRossBlockEntities;
 import rbasamoyai.betsyross.content.BetsyRossBlocks;
 import rbasamoyai.betsyross.content.BetsyRossCreativeModeTab;
 import rbasamoyai.betsyross.content.BetsyRossItems;
-import rbasamoyai.betsyross.content.BetsyRossMenus;
 import rbasamoyai.betsyross.content.BetsyRossStats;
 import rbasamoyai.betsyross.network.BetsyRossNetwork;
 
@@ -54,8 +53,6 @@ public class BetsyRossForge {
             BetsyRossItems.registerAll(registryConsumer(Registries.ITEM, event));
         } else if (event.getRegistryKey() == Registries.BLOCK_ENTITY_TYPE) {
             BetsyRossBlockEntities.registerAll(registryConsumer(Registries.BLOCK_ENTITY_TYPE, event));
-        } else if (event.getRegistryKey() == Registries.MENU) {
-            BetsyRossMenus.registerAll(registryConsumer(Registries.MENU, event));
         } else if (event.getRegistryKey() == Registries.CREATIVE_MODE_TAB) {
             BetsyRossCreativeModeTab.create(registryConsumer(Registries.CREATIVE_MODE_TAB, event));
         } else if (event.getRegistryKey() == Registries.CUSTOM_STAT) {

@@ -20,7 +20,9 @@ public abstract class ClientPacketListenerMixin implements ClientGamePacketListe
         CommonPacket cpacket = BetsyRossNetwork.constructCommonPacket(packet.getIdentifier(), packet.getData());
         if (cpacket == null)
             return;
-        cpacket.handle(Minecraft.getInstance(), this, null);
+        Minecraft.getInstance().execute(() -> {
+            cpacket.handle(Minecraft.getInstance(), this, null);
+        });
         if (ci.isCancellable())
             ci.cancel();
     }

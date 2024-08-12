@@ -1,6 +1,6 @@
 {
-  "parent": "builtin/entity",
+  "parent": "minecraft:item/generated",
   "textures": {
-    "particle": "minecraft:block/white_wool"
+    "layer0": "betsyross:item/flag_block"
   }
 }
