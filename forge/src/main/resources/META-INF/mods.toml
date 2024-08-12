@@ -32,6 +32,13 @@ description="""Large flags with images across the internets"""
 [[dependencies.betsyross]]
    modId="immersive_paintings"
    mandatory=true
-   versionRange="[0.6.7,)"
+   versionRange="[${immersive_paintings_requirement},)"
    ordering="NONE"
    side="BOTH"
+
+[[dependencies.betsyross]]
+   modId = "curios"
+   mandatory = false
+   versionRange = "[${curios_requirement},)"
+   ordering = "NONE"
+   side = "BOTH"
