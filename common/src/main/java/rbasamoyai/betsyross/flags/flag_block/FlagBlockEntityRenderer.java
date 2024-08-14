@@ -26,6 +26,7 @@ import net.minecraft.world.phys.Vec3;
 import rbasamoyai.betsyross.BetsyRossClient;
 import rbasamoyai.betsyross.config.BetsyRossConfig;
 import rbasamoyai.betsyross.content.BetsyRossBlocks;
+import rbasamoyai.betsyross.remix.CulledRenderBBBlockEntity;
 import rbasamoyai.betsyross.remix.FrustumCache;
 
 public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEntity> {
@@ -38,7 +39,7 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 
 	@Override
 	public void render(FlagBlockEntity flag, float partialTicks, PoseStack stack, MultiBufferSource buffers, int packedLight, int packedOverlay) {
-        if (!FrustumCache.isVisible(flag.commonGetRenderBoundingBox()))
+        if (flag instanceof CulledRenderBBBlockEntity culled && !FrustumCache.isVisible(culled.getRenderBox()))
             return;
 
 		ResourceLocation flagId = flag.getFlagId();

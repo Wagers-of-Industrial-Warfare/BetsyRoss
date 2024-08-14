@@ -1,5 +1,10 @@
 # Changelog
 
+2.0.1
+---
+**Fixed**
+- Fixed crash when culling Flag block rendering
+
 2.0.0
 ---
 

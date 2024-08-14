@@ -19,14 +19,23 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.item.ItemPropertyFunction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.RotationSegment;
+import net.minecraft.world.phys.AABB;
 import rbasamoyai.betsyross.content.BetsyRossBlockEntities;
 import rbasamoyai.betsyross.content.BetsyRossBlocks;
 import rbasamoyai.betsyross.content.BetsyRossItems;
+import rbasamoyai.betsyross.flags.flag_block.DrapedFlagBlock;
+import rbasamoyai.betsyross.flags.flag_block.FlagBlock;
+import rbasamoyai.betsyross.flags.flag_block.FlagBlockEntity;
 import rbasamoyai.betsyross.flags.flag_block.FlagBlockEntityRenderer;
 import rbasamoyai.betsyross.flags.standards.ArmorBannerRenderer;
 import rbasamoyai.betsyross.flags.standards.BannerStandardRenderer;
@@ -144,6 +153,27 @@ public class BetsyRossClient {
     }
 
     public record FlagRenderInfo(ResourceLocation location, int width, int height) {
+    }
+
+    public static AABB getFlagBlockEntityBox(FlagBlockEntity flag) {
+        BlockState state = flag.getBlockState();
+        BlockPos pos = flag.getBlockPos();
+        Painting painting = ClientPaintingManager.getPaintings().get(flag.getFlagId());
+        if (painting == null)
+            painting = ClientPaintingManager.getPainting(BetsyRoss.DEFAULT_FLAG);
+        int flagWidth = painting.width;
+        int flagHeight = painting.height;
+        if (state.is(BetsyRossBlocks.FLAG_BLOCK.get())) {
+            float dir = RotationSegment.convertToDegrees(state.getValue(FlagBlock.ROTATION));
+            float f1 = Mth.sin(dir * Mth.DEG_TO_RAD);
+            float f2 = Mth.cos(dir * Mth.DEG_TO_RAD);
+            return new AABB(pos).expandTowards(f1 * flagWidth, flagHeight, f2 * flagWidth).inflate(1);
+        }
+        if (state.is(BetsyRossBlocks.DRAPED_FLAG_BLOCK.get())) {
+            Direction dir = state.getValue(DrapedFlagBlock.FACING);
+            return new AABB(pos.relative(dir.getOpposite()), pos.below(flagHeight).relative(dir.getCounterClockWise(), flagWidth)).inflate(1);
+        }
+        return new AABB(pos);
     }
 
 }
