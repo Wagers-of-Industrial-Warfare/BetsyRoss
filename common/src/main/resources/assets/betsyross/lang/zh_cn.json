@@ -1,1 +1,21 @@
-
+{
+    "itemGroup.betsyross": "沉浸画框：旗帜",
+  
+    "item.betsyross.flag_standard": "手举旗帜（横向）",
+    "item.betsyross.banner_standard": "手举旗帜（竖向）",
+    "item.betsyross.armor_banner": "头戴旗帜",
+    "item.betsyross.logo_flag": "Logo 旗帜",
+  
+    "block.betsyross.flag_block": "旗帜",
+    "block.betsyross.flag_block.tooltip.width": "宽度: %s 个方块",
+    "block.betsyross.flag_block.tooltip.height": "高度 %s 个方块",
+    "block.betsyross.embroidery_table": "旗帜刺绣台",
+  
+    "gui.betsyross.embroidery_table.invalid_flag": "这面旗需要放在世界上，而不是旗帜刺绣台上",
+    "gui.betsyross.embroidery_table.invalid_item": "你只能在手持旗帜时使用旗帜刺绣台",
+  
+    "gui.betsyross.flag_maker.too_wide": "旗帜的宽度不能超过 %s 个方块",
+    "gui.betsyross.flag_maker.too_tall": "旗帜的高度不能超过 %s 个方块",
+  
+    "tooltip.betsyross.flag_id": "旗帜: %s"
+}  
