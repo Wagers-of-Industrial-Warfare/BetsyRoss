@@ -51,7 +51,7 @@ public class FlagStandardRenderer extends BlockEntityWithoutLevelRenderer {
 
 		posestack.pushPose();
 
-		FlagAnimationDetail detail = BetsyRossConfig.CLIENT.animationDetail.get();
+		FlagAnimationDetail detail = BetsyRossConfig.CLIENT.animationDetail;
 
 		float pt = mc.isPaused() ? mc.getDeltaFrameTime() : mc.getFrameTime();
 

@@ -23,8 +23,8 @@ public class FlagBlockScreen extends AbstractFlagScreen {
         BetsyRossClient.sendToServer(new ServerboundModifyFlagBlockPacket(this.blockPos, loc));
     }
 
-    @Override protected int getConfigWidth() { return BetsyRossConfig.SERVER.flagBlockMaxWidth.get(); }
-    @Override protected int getConfigHeight() { return BetsyRossConfig.SERVER.flagBlockMaxHeight.get(); }
+    @Override protected int getConfigWidth() { return BetsyRossConfig.SERVER.flagBlockMaxWidth; }
+    @Override protected int getConfigHeight() { return BetsyRossConfig.SERVER.flagBlockMaxHeight; }
 
     @Override protected boolean canUpdateFlag() { return this.flagBlockEntity != null; }
 

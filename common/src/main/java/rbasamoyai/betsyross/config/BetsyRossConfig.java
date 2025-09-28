@@ -1,33 +1,23 @@
 package rbasamoyai.betsyross.config;
 
-import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
-import org.apache.commons.lang3.tuple.Pair;
-
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.config.ModConfig;
+import me.fzzyhmstrs.fzzy_config.api.ConfigApiJava;
+import me.fzzyhmstrs.fzzy_config.api.RegisterType;
+import me.fzzyhmstrs.fzzy_config.config.Config;
+import rbasamoyai.betsyross.BetsyRoss;
 
 public class BetsyRossConfig {
 
-	public static ForgeConfigSpec CLIENT_SPEC;
-	public static CfgClient CLIENT;
-	static {
-		Pair<CfgClient, ForgeConfigSpec> pair = new ForgeConfigSpec.Builder().configure(CfgClient::new);
-		CLIENT_SPEC = pair.getRight();
-		CLIENT = pair.getLeft();
-	}
+    public static final String CONFIG_ID = "config." + BetsyRoss.MOD_ID + ".";
 
-	public static ForgeConfigSpec SERVER_SPEC;
-	public static CfgServer SERVER;
-	static {
-		Pair<CfgServer, ForgeConfigSpec> pair = new ForgeConfigSpec.Builder().configure(CfgServer::new);
-		SERVER_SPEC = pair.getRight();
-		SERVER = pair.getLeft();
-	}
+    public static final CfgClient CLIENT = register(CfgClient::new, RegisterType.CLIENT);
+    public static final CfgServer SERVER = register(CfgServer::new, RegisterType.SERVER);
 
-    public static void init(BiConsumer<ModConfig.Type, ForgeConfigSpec> cons) {
-        cons.accept(ModConfig.Type.CLIENT, CLIENT_SPEC);
-        cons.accept(ModConfig.Type.SERVER, SERVER_SPEC);
+    public static void init() {}
+
+    private static <T extends Config> T register(Supplier<T> sup, RegisterType type) {
+        return ConfigApiJava.registerAndLoadConfig(sup, type);
     }
 
 }

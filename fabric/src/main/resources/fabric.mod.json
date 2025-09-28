@@ -27,7 +27,8 @@
   "depends": {
     "fabricloader": ">=0.15.7",
     "minecraft": ">=1.20.1",
-    "immersive_paintings": ">=${immersive_paintings_requirement}"
+    "immersive_paintings": ">=${immersive_paintings_requirement}",
+    "fzzy_config": ">=${fzzy_config_requirement}"
   },
   "breaks": {
     "trinkets": "<${trinkets_breaking}"

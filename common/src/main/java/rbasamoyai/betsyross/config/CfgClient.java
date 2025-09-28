@@ -1,18 +1,17 @@
 package rbasamoyai.betsyross.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+import me.fzzyhmstrs.fzzy_config.annotations.Translation;
+import me.fzzyhmstrs.fzzy_config.config.Config;
 import rbasamoyai.betsyross.BetsyRoss;
 import rbasamoyai.betsyross.flags.flag_block.FlagAnimationDetail;
 
-public class CfgClient {
+@Translation(prefix = BetsyRossConfig.CONFIG_ID + "client")
+public class CfgClient extends Config {
 
-	public final ConfigValue<FlagAnimationDetail> animationDetail;
+    public CfgClient() {
+        super(BetsyRoss.path("client_config"));
+    }
 
-	public CfgClient(ForgeConfigSpec.Builder builder) {
-		this.animationDetail = builder.comment("Level of animation detail for flags to use. Only applies to certain flags.")
-				.translation(BetsyRoss.key("config", "animationDetail"))
-				.defineEnum("animationDetail", FlagAnimationDetail.WAVE);
-	}
+	public final FlagAnimationDetail animationDetail = FlagAnimationDetail.WAVE;
 
 }

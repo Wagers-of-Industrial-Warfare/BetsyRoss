@@ -29,11 +29,11 @@ public class EmbroideryTableScreen extends AbstractFlagScreen {
     protected int getConfigWidth() {
         ItemStack itemStack = this.getTargetedItemStack();
         if (itemStack.is(BetsyRossItems.FLAG_STANDARD.get()))
-            return BetsyRossConfig.SERVER.flagStandardMaxWidth.get();
+            return BetsyRossConfig.SERVER.flagStandardMaxWidth;
         if (itemStack.is(BetsyRossItems.BANNER_STANDARD.get()))
-            return BetsyRossConfig.SERVER.bannerStandardMaxWidth.get();
+            return BetsyRossConfig.SERVER.bannerStandardMaxWidth;
         if (itemStack.is(BetsyRossItems.ARMOR_BANNER.get()))
-            return BetsyRossConfig.SERVER.armorBannerMaxWidth.get();
+            return BetsyRossConfig.SERVER.armorBannerMaxWidth;
         return -1;
     }
 
@@ -41,11 +41,11 @@ public class EmbroideryTableScreen extends AbstractFlagScreen {
     protected int getConfigHeight() {
         ItemStack itemStack = this.getTargetedItemStack();
         if (itemStack.is(BetsyRossItems.FLAG_STANDARD.get()))
-            return BetsyRossConfig.SERVER.flagStandardMaxHeight.get();
+            return BetsyRossConfig.SERVER.flagStandardMaxHeight;
         if (itemStack.is(BetsyRossItems.BANNER_STANDARD.get()))
-            return BetsyRossConfig.SERVER.bannerStandardMaxHeight.get();
+            return BetsyRossConfig.SERVER.bannerStandardMaxHeight;
         if (itemStack.is(BetsyRossItems.ARMOR_BANNER.get()))
-            return BetsyRossConfig.SERVER.armorBannerMaxHeight.get();
+            return BetsyRossConfig.SERVER.armorBannerMaxHeight;
         return -1;
     }
 

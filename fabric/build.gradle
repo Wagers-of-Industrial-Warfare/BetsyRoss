@@ -62,6 +62,7 @@ processResources {
     def properties = [
         version: project.version,
         immersive_paintings_requirement: immersive_paintings_fabric_requirement,
+        fzzy_config_requirement: fzzy_config_fabric_requirement,
         trinkets_breaking: trinkets_requirement
     ]
     inputs.properties properties

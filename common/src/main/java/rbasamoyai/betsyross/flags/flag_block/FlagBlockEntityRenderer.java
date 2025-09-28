@@ -56,7 +56,7 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 
 		if (state.is(BetsyRossBlocks.FLAG_BLOCK.get())) {
 			float dir = RotationSegment.convertToDegrees(state.getValue(FlagBlock.ROTATION));
-			FlagAnimationDetail detail = BetsyRossConfig.CLIENT.animationDetail.get();
+			FlagAnimationDetail detail = BetsyRossConfig.CLIENT.animationDetail;
 
 			stack.pushPose();
 			stack.translate(0.5, h, 0.5);
