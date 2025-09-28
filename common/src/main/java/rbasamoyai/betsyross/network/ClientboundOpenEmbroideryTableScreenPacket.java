@@ -9,7 +9,7 @@ import net.minecraft.network.PacketListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import rbasamoyai.betsyross.BetsyRoss;
-import rbasamoyai.betsyross.EnvExecute;
+import rbasamoyai.betsyross.platform.BetsyRossServices;
 
 public record ClientboundOpenEmbroideryTableScreenPacket(int slot, int minResolution, int maxResolution, boolean showOtherPlayerPaintings,
                                                          int permissionLevel) implements CommonPacket {
@@ -31,7 +31,7 @@ public record ClientboundOpenEmbroideryTableScreenPacket(int slot, int minResolu
 
     @Override
     public void handle(Executor exec, PacketListener listener, @Nullable ServerPlayer sender) {
-        EnvExecute.executeOnClient(() -> () -> BetsyRossClientHandlers.openEmbroideryTableScreen(this));
+        BetsyRossServices.CLIENT_EXECUTOR.executeOnClient(() -> () -> BetsyRossClientHandlers.openEmbroideryTableScreen(this));
     }
 
     @Override public ResourceLocation name() { return ID; }

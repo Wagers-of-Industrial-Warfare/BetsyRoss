@@ -10,7 +10,7 @@ import net.minecraft.network.PacketListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import rbasamoyai.betsyross.BetsyRoss;
-import rbasamoyai.betsyross.EnvExecute;
+import rbasamoyai.betsyross.platform.BetsyRossServices;
 
 public record ClientboundOpenFlagBlockScreenPacket(BlockPos pos, int minResolution, int maxResolution, boolean showOtherPlayerPaintings,
                                                    int permissionLevel) implements CommonPacket {
@@ -32,7 +32,7 @@ public record ClientboundOpenFlagBlockScreenPacket(BlockPos pos, int minResoluti
 
     @Override
     public void handle(Executor exec, PacketListener listener, @Nullable ServerPlayer sender) {
-        EnvExecute.executeOnClient(() -> () -> BetsyRossClientHandlers.openFlagBlockScreen(this));
+        BetsyRossServices.CLIENT_EXECUTOR.executeOnClient(() -> () -> BetsyRossClientHandlers.openFlagBlockScreen(this));
     }
 
     @Override public ResourceLocation name() { return ID; }

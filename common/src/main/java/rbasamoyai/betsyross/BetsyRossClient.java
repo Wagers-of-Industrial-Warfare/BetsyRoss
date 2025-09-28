@@ -8,7 +8,6 @@ import java.util.function.Supplier;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import dev.architectury.injectables.annotations.ExpectPlatform;
 import immersive_paintings.resources.ClientPaintingManager;
 import immersive_paintings.resources.Painting;
 import net.minecraft.client.Minecraft;
@@ -18,12 +17,10 @@ import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
-import net.minecraft.client.renderer.item.ItemPropertyFunction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -42,6 +39,7 @@ import rbasamoyai.betsyross.flags.standards.BannerStandardRenderer;
 import rbasamoyai.betsyross.flags.standards.FlagStandardRenderer;
 import rbasamoyai.betsyross.network.BetsyRossNetwork;
 import rbasamoyai.betsyross.network.CommonPacket;
+import rbasamoyai.betsyross.platform.BetsyRossClientServices;
 
 public class BetsyRossClient {
 
@@ -85,7 +83,7 @@ public class BetsyRossClient {
     }
 
     public static void init(BiConsumer<Block, RenderType> layerRegistration) {
-        registerItemProperty(BetsyRossItems.BANNER_STANDARD.get(), BetsyRoss.path("raised"), (stack, level, entity, seed) -> {
+        BetsyRossClientServices.CLIENT_INDEX_PLATFORM.registerItemProperty(BetsyRossItems.BANNER_STANDARD.get(), BetsyRoss.path("raised"), (stack, level, entity, seed) -> {
             return entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1 : 0;
         });
 
@@ -102,11 +100,6 @@ public class BetsyRossClient {
         cons.accept(SPECIAL_BANNER_STANDARD_MODEL);
         cons.accept(SPECIAL_BANNER_STANDARD_RAISED_MODEL);
         cons.accept(SPECIAL_FLAG_STANDARD_MODEL);
-    }
-
-    @ExpectPlatform
-    public static void registerItemProperty(Item item, ResourceLocation location, ItemPropertyFunction func) {
-        throw new AssertionError();
     }
 
     public static void registerBlockEntityRenderers() {
