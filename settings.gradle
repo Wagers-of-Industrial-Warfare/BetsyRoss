@@ -1,10 +1,19 @@
 pluginManagement {
     repositories {
-        maven { url "https://maven.fabricmc.net/" }
-        maven { url "https://maven.architectury.dev/" }
-        maven { url "https://maven.minecraftforge.net/" }
-        maven { url = "https://maven.quiltmc.org/repository/release" }
         gradlePluginPortal()
+        mavenCentral()
+        exclusiveContent {
+            forRepository {
+                maven {
+                    name = 'Fabric'
+                    url = uri('https://maven.fabricmc.net')
+                }
+            }
+            filter {
+                includeGroup('net.fabricmc')
+                includeGroup('fabric-loom')
+            }
+        }
     }
 }
 plugins {
@@ -13,6 +22,6 @@ plugins {
 
 include("common")
 include("fabric")
-include("forge")
+//include("forge")
 
-rootProject.name = "BetsyRoss"
+rootProject.name = "${mod_id}"

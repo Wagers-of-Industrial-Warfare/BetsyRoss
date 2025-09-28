@@ -1,16 +1,22 @@
-architectury {
-    common(enabled_platforms.split(","))
+plugins {
+    id 'multiloader-common'
+    id 'fabric-loom'
 }
 
-loom {
-    accessWidenerPath = file("src/main/resources/betsyross.accesswidener")
+repositories {
 }
 
 dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip")
+    }
+
     modImplementation("net.fabricmc:fabric-loader:${fabric_loader_version}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}")
 
-    modApi("curse.maven:forge-config-api-port-fabric-547434:${config_api_id}")
+    modImplementation("me.fzzyhmstrs:fzzy_config:${fzzy_config_version}")
     modImplementation("curse.maven:immersive-paintings-639584:${immersive_paintings_fabric_file}")
 
     annotationProcessor(implementation("io.github.llamalad7:mixinextras-common:${mixinextras_version}")) // MixinExtras
@@ -18,16 +24,29 @@ dependencies {
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
 }
 
-publishing {
-    publications {
-        mavenCommon(MavenPublication) {
-            artifactId = rootProject.archives_base_name
-            from components.java
-        }
+configurations {
+    commonJava {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+    commonResources {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+artifacts {
+    commonJava sourceSets.main.java.sourceDirectories.singleFile
+    commonResources sourceSets.main.resources.sourceDirectories.singleFile
+}
+
+loom {
+    def aw = file("src/main/resources/${mod_id}.accesswidener")
+    if (aw.exists()) {
+        accessWidenerPath.set(aw)
     }
 
-    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-    repositories {
-        // Add repositories to publish to here.
+    mixin {
+        defaultRefmapName.set("${mod_id}.refmap.json")
     }
 }
