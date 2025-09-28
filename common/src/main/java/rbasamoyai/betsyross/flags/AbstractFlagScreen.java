@@ -1,5 +1,6 @@
 package rbasamoyai.betsyross.flags;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -8,51 +9,53 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FilenameUtils;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import immersive_paintings.Main;
-import immersive_paintings.client.ClientUtils;
-import immersive_paintings.client.gui.ImmersivePaintingScreen;
-import immersive_paintings.client.gui.ImmersivePaintingScreen.Page;
-import immersive_paintings.client.gui.widget.CallbackCheckboxWidget;
-import immersive_paintings.client.gui.widget.DefaultButtonWidget;
-import immersive_paintings.client.gui.widget.IntegerSliderWidget;
-import immersive_paintings.client.gui.widget.PaintingWidget;
-import immersive_paintings.client.gui.widget.PercentageSliderWidget;
-import immersive_paintings.client.gui.widget.TooltipButtonWidget;
-import immersive_paintings.cobalt.network.NetworkHandler;
-import immersive_paintings.network.LazyNetworkManager;
-import immersive_paintings.network.c2s.PaintingDeleteRequest;
-import immersive_paintings.network.c2s.RegisterPaintingRequest;
-import immersive_paintings.network.c2s.UploadPaintingRequest;
-import immersive_paintings.network.s2c.RegisterPaintingResponse;
-import immersive_paintings.resources.ByteImage;
-import immersive_paintings.resources.ClientPaintingManager;
-import immersive_paintings.resources.Painting;
-import immersive_paintings.util.FlowingText;
-import immersive_paintings.util.ImageManipulations;
-import immersive_paintings.util.Utils;
+import net.conczin.immersive_paintings.ClientPaintingManager;
+import net.conczin.immersive_paintings.Main;
+import net.conczin.immersive_paintings.Painting;
+import net.conczin.immersive_paintings.client.gui.ImmersivePaintingScreen;
+import net.conczin.immersive_paintings.client.gui.ImmersivePaintingScreen.Page;
+import net.conczin.immersive_paintings.client.gui.widget.IntegerSliderWidget;
+import net.conczin.immersive_paintings.client.gui.widget.PaintingWidget;
+import net.conczin.immersive_paintings.client.gui.widget.PercentageSliderWidget;
+import net.conczin.immersive_paintings.network.LazyNetworkManager;
+import net.conczin.immersive_paintings.network.NetworkHandler;
+import net.conczin.immersive_paintings.network.payload.c2s.ImageUploadPayload;
+import net.conczin.immersive_paintings.network.payload.c2s.PaintingDeletePayload;
+import net.conczin.immersive_paintings.network.payload.c2s.PaintingRegisterPayload;
+import net.conczin.immersive_paintings.network.payload.s2c.PaintingRegisterErrorPayload;
+import net.conczin.immersive_paintings.registration.Configs;
+import net.conczin.immersive_paintings.util.ImageManipulations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
-import rbasamoyai.betsyross.foundation.BetsyRossUtils;
+import rbasamoyai.betsyross.BetsyRoss;
 import rbasamoyai.betsyross.mixin.client.PixelatorSettingsAccessor;
 
 /**
@@ -78,12 +81,12 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
 
     protected Button pageWidget;
 
-    protected final List<PaintingWidget> paintingWidgetList = new LinkedList<>();
-    protected ByteImage currentImage;
+    protected final Map<ResourceLocation, PaintingWidget> paintingWidgets = new HashMap<>();
+    protected BufferedImage currentImage;
     protected static int currentImagePixelZoomCache = -1;
     protected String currentImageName;
     protected ImmersivePaintingScreen.PixelatorSettings settings;
-    protected ByteImage pixelatedImage;
+    protected BufferedImage pixelatedImage;
 
     protected List<File> screenshots = List.of();
     protected int screenshotPage;
@@ -93,7 +96,7 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
     protected boolean shouldReProcess;
     protected static volatile boolean shouldUpload;
 
-    final ExecutorService service = Executors.newFixedThreadPool(1);
+    private final static ExecutorService service = Executors.newFixedThreadPool(1);
 
     protected AbstractFlagScreen(int minResolution, int maxResolution, boolean showOtherPlayersPaintings, int uploadPermissionLevel) {
         super(Component.translatable("block.betsyross.flag_block"));
@@ -134,7 +137,7 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
         switch (this.page) {
             case NEW -> {
                 context.fill(this.width / 2 - 115, this.height / 2 - 68, this.width / 2 + 115, this.height / 2 - 41, 0x50000000);
-                List<Component> wrap = FlowingText.wrap(Component.translatable("immersive_paintings.drop"), 220);
+                List<Component> wrap = ImmersivePaintingScreen.wrap(Component.translatable("immersive_paintings.gui.drop"), 220);
                 int y = this.height / 2 - 40 - wrap.size() * 12;
                 for (Component text : wrap) {
                     context.drawCenteredString(this.font, text, this.width / 2, y, 0xFFFFFFFF);
@@ -143,17 +146,13 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
             }
             case CREATE -> {
                 if (this.shouldReProcess && this.currentImage != null) {
-                    Runnable task = () -> {
-                        this.pixelatedImage = ImmersivePaintingScreen.pixelateImage(this.currentImage, this.settings);
-                        shouldUpload = true;
-                    };
-                    this.service.submit(task);
+                    service.submit(this::pixellateImage);
                     this.shouldReProcess = false;
                 }
 
                 if (shouldUpload && this.pixelatedImage != null) {
                     Minecraft.getInstance().getTextureManager().register(Main.locate("temp_pixelated"),
-                        new DynamicTexture(ClientUtils.byteImageToNativeImage(this.pixelatedImage)));
+                        new DynamicTexture(ImageManipulations.bufferedToNative(this.pixelatedImage)));
                 }
 
                 int maxWidth = 190;
@@ -173,7 +172,7 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
             }
             case DELETE -> {
                 context.fill(this.width / 2 - 160, this.height / 2 - 50, this.width / 2 + 160, this.height / 2 + 50, 0x88000000);
-                List<Component> wrap = FlowingText.wrap(Component.translatable("immersive_paintings.confirm_deletion"), 300);
+                List<Component> wrap = ImmersivePaintingScreen.wrap(Component.translatable("immersive_paintings.gui.confirm_deletion"), 300);
                 int y = this.height / 2 - 35;
                 for (Component t : wrap) {
                     context.drawCenteredString(this.font, t, this.width / 2, y, 0XFFFFFF);
@@ -182,7 +181,7 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
             }
             case ADMIN_DELETE -> {
                 context.fill(this.width / 2 - 160, this.height / 2 - 50, this.width / 2 + 160, this.height / 2 + 50, 0x88000000);
-                List<Component> wrap = FlowingText.wrap(Component.translatable("immersive_paintings.confirm_admin_deletion"), 300);
+                List<Component> wrap = ImmersivePaintingScreen.wrap(Component.translatable("immersive_paintings.gui.confirm_admin_deletion"), 300);
                 int y = this.height / 2 - 35;
                 for (Component t : wrap) {
                     context.drawCenteredString(this.font, t, this.width / 2, y, 0XFFFFFF);
@@ -190,11 +189,16 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
                 }
             }
             case LOADING -> {
-                Component text = Component.translatable("immersive_paintings.upload", (int) Math.ceil(LazyNetworkManager.getRemainingTime()));
+                Component text = Component.translatable("immersive_paintings.gui.upload", (int) Math.ceil(LazyNetworkManager.getRemainingTime()));
                 context.drawCenteredString(this.font, text, this.width / 2, this.height / 2, 0xFFFFFFFF);
             }
         }
         super.render(context, mouseX, mouseY, delta);
+    }
+
+    private void pixellateImage() {
+        this.pixelatedImage = ImmersivePaintingScreen.pixelateImage(this.currentImage, this.settings);
+        shouldUpload = true;
     }
 
     protected void rebuild() {
@@ -213,9 +217,11 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
             int x = this.width / 2 - 200;
             int w = 400 / b.size();
             for (Page page : b) {
-                this.addRenderableWidget(new DefaultButtonWidget(x, height / 2 - 90 - 22, w, 20,
-                    Component.translatable("immersive_paintings.page." + page.name().toLowerCase(Locale.ROOT)),
-                    sender -> this.setPage(page))).active = page != this.page;
+                Button btn = this.addRenderableWidget(Button.builder(
+                    Component.translatable("immersive_paintings.gui.page." + page.name().toLowerCase(Locale.ROOT)), sender -> this.setPage(page))
+                    .bounds(x, height / 2 - 90 - 22, w, 20)
+                    .build());
+                btn.active = page != this.page;
                 x += w;
             }
         }
@@ -229,25 +235,29 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
                     this.height / 2 - 38, 180, 16, Component.literal("URL")));
                 editBox.setMaxLength(1024);
 
-                this.addRenderableWidget(new DefaultButtonWidget(this.width / 2 - 50, this.height / 2 - 15, 100, 20,
-                    Component.translatable("immersive_paintings.load"), sender -> this.loadImage(editBox.getValue())));
+                this.addRenderableWidget(Button.builder(Component.translatable("immersive_paintings.gui.load"), sender -> this.loadImage(editBox.getValue()))
+                    .bounds(this.width / 2 - 50, this.height / 2 - 15, 100, 20)
+                    .build());
 
                 //screenshots
-                rebuildScreenshots();
+                this.rebuildScreenshots();
 
                 //screenshot page
-                this.addRenderableWidget(new DefaultButtonWidget(this.width / 2 - 65, this.height / 2 + 70, 30, 20,
-                    Component.literal("<<"), sender -> this.setScreenshotPage(this.screenshotPage - 1)));
-                this.pageWidget = this.addRenderableWidget(new DefaultButtonWidget(this.width / 2 - 65 + 30, this.height / 2 + 70, 70, 20,
-                    Component.literal(""), sender -> {}));
-                this.addRenderableWidget(new DefaultButtonWidget(this.width / 2 - 65 + 100, this.height / 2 + 70, 30, 20,
-                    Component.literal(">>"), sender -> this.setScreenshotPage(this.screenshotPage + 1)));
-                setScreenshotPage(this.screenshotPage);
+                this.addRenderableWidget(Button.builder(Component.literal("<<"), sender -> this.setScreenshotPage(this.screenshotPage - 1))
+                    .bounds(this.width / 2 - 65, this.height / 2 + 70, 30, 20)
+                    .build());
+                this.pageWidget = this.addRenderableWidget(Button.builder(Component.literal(""), sender -> {})
+                    .bounds(this.width / 2 - 65 + 30, this.height / 2 + 70, 70, 20)
+                    .build());
+                this.addRenderableWidget(Button.builder(Component.literal(">>"), sender -> this.setScreenshotPage(this.screenshotPage + 1))
+                    .bounds(this.width / 2 - 65 + 100, this.height / 2 + 70, 30, 20)
+                    .build());
+                this.setScreenshotPage(this.screenshotPage);
             }
             case CREATE -> {
                 // Name
                 EditBox editBox = this.addRenderableWidget(new EditBox(this.font, this.width / 2 - 90, this.height / 2 - 100, 180, 20,
-                    Component.translatable("immersive_paintings.name")));
+                    Component.translatable("immersive_paintings.gui.name")));
                 editBox.setMaxLength(256);
                 editBox.setValue(this.currentImageName);
                 editBox.setResponder(s -> this.currentImageName = s);
@@ -255,14 +265,14 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
                 int y = this.height / 2 - 60;
 
                 // Width
-                this.addRenderableWidget(new IntegerSliderWidget(this.width / 2 - 200, y, 100, 20, "immersive_paintings.width", this.settings.width, 1, 16, v -> {
+                this.addRenderableWidget(new IntegerSliderWidget(this.width / 2 - 200, y, 100, 20, "immersive_paintings.gui.width", this.settings.width, 1, 16, v -> {
                     this.settings.width = v;
                     this.shouldReProcess = true;
                 }));
                 y += 22;
 
                 // Height
-                this.addRenderableWidget(new IntegerSliderWidget(this.width / 2 - 200, y, 100, 20, "immersive_paintings.height", this.settings.height, 1, 16, v -> {
+                this.addRenderableWidget(new IntegerSliderWidget(this.width / 2 - 200, y, 100, 20, "immersive_paintings.gui.height", this.settings.height, 1, 16, v -> {
                     this.settings.height = v;
                     this.shouldReProcess = true;
                 }));
@@ -271,139 +281,160 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
                 // Resolution
                 int x = this.width / 2 - 200;
 
-                TooltipButtonWidget widget = this.addRenderableWidget(new TooltipButtonWidget(x + 25, y, 50, 20,
-                    Component.literal(String.valueOf(this.settings.resolution)),
-                    Component.translatable("immersive_paintings.tooltip.resolution"), v -> {}));
+                Button resolutionWidget = this.addRenderableWidget(Button.builder(Component.literal(String.valueOf(this.settings.resolution)), v -> {})
+                    .bounds(x + 25, y, 50, 20)
+                    .tooltip(Tooltip.create(Component.translatable("immersive_paintings.gui.tooltip.resolution")))
+                    .build());
 
-                this.addRenderableWidget(new TooltipButtonWidget(x, y, 25, 20,
-                    Component.literal("<"),
-                    Component.translatable("immersive_paintings.tooltip.resolution"),
-                    v -> {
+                this.addRenderableWidget(Button.builder(Component.literal("<"), v -> {
                         this.settings.resolution = Math.max(this.minResolution, this.settings.resolution / 2);
                         if (this.settings.pixelArt) {
                             this.adaptToPixelArt();
                             this.refreshPage();
                         }
                         this.shouldReProcess = true;
-                        widget.setMessage(Component.literal(String.valueOf(this.settings.resolution)));
-                    }));
+                        resolutionWidget.setMessage(Component.literal(String.valueOf(this.settings.resolution)));
+                    })
+                    .tooltip(Tooltip.create(Component.translatable("immersive_paintings.gui.tooltip.resolution")))
+                    .bounds(x, y, 25, 20)
+                    .build());
 
-                this.addRenderableWidget(new TooltipButtonWidget(x + 75, y, 25, 20,
-                    Component.literal(">"),
-                    Component.translatable("immersive_paintings.tooltip.resolution"),
-                    v -> {
+                this.addRenderableWidget(Button.builder(Component.literal(">"), v -> {
                         this.settings.resolution = Math.min(this.maxResolution, this.settings.resolution * 2);
                         if (this.settings.pixelArt) {
                             this.adaptToPixelArt();
                             this.refreshPage();
                         }
                         this.shouldReProcess = true;
-                        widget.setMessage(Component.literal(String.valueOf(this.settings.resolution)));
-                    }));
+                        resolutionWidget.setMessage(Component.literal(String.valueOf(this.settings.resolution)));
+                    })
+                    .bounds(x + 75, y, 25, 20)
+                    .tooltip(Tooltip.create(Component.translatable("immersive_paintings.gui.tooltip.resolution")))
+                    .build());
                 y += 22;
                 y += 10;
 
                 // Color reduction
-                this.addRenderableWidget(new IntegerSliderWidget(this.width / 2 - 200, y, 100, 20, "immersive_paintings.colors", this.settings.colors, 1, 25, v -> {
+                this.addRenderableWidget(new IntegerSliderWidget(this.width / 2 - 200, y, 100, 20, "immersive_paintings.gui.colors", this.settings.colors, 1, 25, v -> {
                     this.settings.colors = v;
                     this.shouldReProcess = true;
                 })).active = !this.settings.pixelArt;
                 y += 22;
 
                 // Dither
-                this.addRenderableWidget(new PercentageSliderWidget(width / 2 - 200, y, 100, 20, "immersive_paintings.dither", this.settings.dither, v -> {
+                this.addRenderableWidget(new PercentageSliderWidget(this.width / 2 - 200, y, 100, 20, "immersive_paintings.gui.dither", this.settings.dither, v -> {
                     this.settings.dither = v;
                     this.shouldReProcess = true;
                 })).active = !this.settings.pixelArt;
 
                 // PixelArt
                 y = this.height / 2 - 50;
-                this.addRenderableWidget(new CallbackCheckboxWidget(width / 2 + 100, y, 20, 20,
-                    Component.translatable("immersive_paintings.pixelart"),
-                    Component.translatable("immersive_paintings.pixelart.tooltip"),
-                    this.settings.pixelArt, true, b -> {
-                    this.settings.pixelArt = b;
-                    this.adaptToPixelArt();
-                    this.refreshPage();
-                    this.shouldReProcess = true;
-                }));
+                this.addRenderableWidget(Checkbox.builder(Component.translatable("immersive_paintings.gui.pixelart"), this.font)
+                    .pos(this.width / 2 + 100, y)
+                    .selected(this.settings.pixelArt)
+                    .tooltip(Tooltip.create(Component.translatable("immersive_paintings.gui.pixelart.tooltip")))
+                    .onValueChange((widget, value) -> {
+                        this.settings.pixelArt = value;
+                        this.adaptToPixelArt();
+                        this.refreshPage();
+                        this.shouldReProcess = true;
+                    })
+                    .build());
                 y += 22;
 
                 // Hide
-                this.addRenderableWidget(new CallbackCheckboxWidget(this.width / 2 + 100, y, 100, 20,
-                    Component.translatable("immersive_paintings.hide"),
-                    Component.translatable("immersive_paintings.visibility"),
-                    this.settings.hidden, true,
-                    v -> this.settings.hidden = !this.settings.hidden));
+                this.addRenderableWidget(Checkbox.builder(Component.translatable("immersive_paintings.gui.hide"), this.font)
+                    .pos(this.width / 2 + 100, y)
+                    .selected(this.settings.hidden)
+                    .tooltip(Tooltip.create(Component.translatable("immersive_paintings.gui.tooltip.visibility")))
+                    .onValueChange((widget, value) -> this.settings.hidden = !this.settings.hidden)
+                    .build());
+                y += 22;
+
+                // NSFW
+                this.addRenderableWidget(Checkbox.builder(Component.translatable("immersive_paintings.gui.nsfw"), this.font)
+                    .pos(this.width / 2 + 100, y)
+                    .selected(this.settings.nsfw)
+                    .tooltip(Tooltip.create(Component.translatable("immersive_paintings.gui.tooltip.nsfw")))
+                    .onValueChange((widget, value) -> this.settings.nsfw = !this.settings.nsfw)
+                    .build());
                 y += 22;
 
                 // Offset X
-                this.addRenderableWidget(new PercentageSliderWidget(this.width / 2 + 100, y, 100, 20, "immersive_paintings.x_offset", this.settings.offsetX, v -> {
+                this.addRenderableWidget(new PercentageSliderWidget(this.width / 2 + 100, y, 100, 20, "immersive_paintings.gui.x_offset", this.settings.offsetX, v -> {
                     this.settings.offsetX = v;
                     this.shouldReProcess = true;
                 }));
                 y += 22;
 
                 // Offset Y
-                this.addRenderableWidget(new PercentageSliderWidget(this.width / 2 + 100, y, 100, 20, "immersive_paintings.y_offset", this.settings.offsetY, v -> {
+                this.addRenderableWidget(new PercentageSliderWidget(this.width / 2 + 100, y, 100, 20, "immersive_paintings.gui.y_offset", this.settings.offsetY, v -> {
                     this.settings.offsetY = v;
                     this.shouldReProcess = true;
                 }));
                 y += 22;
 
                 // Offset
-                this.addRenderableWidget(new PercentageSliderWidget(this.width / 2 + 100, y, 100, 20, "immersive_paintings.zoom", this.settings.zoom, 1.0, 3.0, v -> {
+                this.addRenderableWidget(new PercentageSliderWidget(this.width / 2 + 100, y, 100, 20, "immersive_paintings.gui.zoom", this.settings.zoom, 1.0, 3.0, v -> {
                     this.settings.zoom = v;
                     this.shouldReProcess = true;
                 })).active = !this.settings.pixelArt;
 
                 // Cancel
-                this.addRenderableWidget(new DefaultButtonWidget(this.width / 2 - 85, this.height / 2 + 75, 80, 20,
-                    Component.translatable("immersive_paintings.cancel"), v -> this.setPage(Page.NEW)));
+                this.addRenderableWidget(Button.builder(Component.translatable("immersive_paintings.gui.cancel"), v -> this.setPage(Page.NEW))
+                    .bounds(this.width / 2 - 85, this.height / 2 + 75, 80, 20)
+                    .build());
 
                 // Save
-                this.addRenderableWidget(new DefaultButtonWidget(this.width / 2 + 5, this.height / 2 + 75, 80, 20, Component.translatable("immersive_paintings.save"),
-                    v -> {
-                        int maxWidth = this.getConfigWidth();
-                        int maxHeight = this.getConfigHeight();
-                        if (maxWidth != 0 && this.settings.width > maxWidth) {
-                            this.setError(Component.translatable("gui.betsyross.flag_maker.too_wide", Math.max(0, maxWidth)));
-                            return;
-                        }
-                        if (maxHeight != 0 && this.settings.height > maxHeight) {
-                            this.setError(Component.translatable("gui.betsyross.flag_maker.too_tall", Math.max(0, maxHeight)));
-                            return;
-                        }
-                        Utils.processByteArrayInChunks(this.pixelatedImage.encode(),
-                            (ints, split, splits) -> LazyNetworkManager.sendToServer(new UploadPaintingRequest(ints, split, splits)));
+                this.addRenderableWidget(Button.builder(Component.translatable("immersive_paintings.gui.save"), v -> {
+                    int maxWidth = this.getConfigWidth();
+                    int maxHeight = this.getConfigHeight();
+                    if (maxWidth != 0 && this.settings.width > maxWidth) {
+                        this.setError(Component.translatable("gui.betsyross.flag_maker.too_wide", Math.max(0, maxWidth)));
+                        return;
+                    }
+                    if (maxHeight != 0 && this.settings.height > maxHeight) {
+                        this.setError(Component.translatable("gui.betsyross.flag_maker.too_tall", Math.max(0, maxHeight)));
+                        return;
+                    }
 
-                        LazyNetworkManager.sendToServer(new RegisterPaintingRequest(this.currentImageName, new Painting(
-                            this.pixelatedImage,
-                            this.settings.width,
-                            this.settings.height,
-                            this.settings.resolution,
-                            this.settings.hidden,
-                            false
-                        )));
+                    byte[] encoded;
 
-                        this.setPage(Page.LOADING);
-                    }));
+                    try {
+                        encoded = ImageManipulations.encode(this.pixelatedImage);
+                    } catch (IOException e) {
+                        BetsyRoss.LOGGER.error("could not encode temp image", e);
+                        return;
+                    }
+
+                    ImageManipulations.processByteArrayInChunks(encoded, (ints, split, splits) -> LazyNetworkManager.sendToServer(
+                        new ImageUploadPayload(ints, split, splits)));
+
+                    // Using LazyNetworkManager here guarantees the register request won't arrive before the image is uploaded
+                    LazyNetworkManager.sendToServer(new PaintingRegisterPayload( this.settings.width, this.settings.height,
+                        this.settings.resolution, this.currentImageName, this.settings.getFlags()));
+
+                    this.setPage(Page.LOADING);
+                }).bounds(this.width / 2 + 5, this.height / 2 + 75, 80, 20).build());
             }
             case YOURS, DATAPACKS, PLAYERS -> {
                 this.rebuildPaintings();
 
                 // page
-                this.addRenderableWidget(new DefaultButtonWidget(this.width / 2 - 35 - 30, this.height / 2 + 80, 30, 20,
-                    Component.literal("<<"), sender -> setSelectionPage(this.selectionPage - 1)));
-                this.pageWidget = this.addRenderableWidget(new DefaultButtonWidget(this.width / 2 - 35, this.height / 2 + 80, 70, 20,
-                    Component.literal(""), sender -> {}));
-                this.addRenderableWidget(new DefaultButtonWidget(this.width / 2 + 35, this.height / 2 + 80, 30, 20,
-                    Component.literal(">>"), sender -> setSelectionPage(this.selectionPage + 1)));
+                this.addRenderableWidget(Button.builder(Component.literal("<<"), sender -> setSelectionPage(this.selectionPage - 1))
+                    .bounds(this.width / 2 - 35 - 30, this.height / 2 + 80, 30, 20)
+                    .build());
+                this.pageWidget = this.addRenderableWidget(Button.builder(Component.literal(""), sender -> {})
+                    .bounds(this.width / 2 - 35, this.height / 2 + 80, 70, 20)
+                    .build());
+                this.addRenderableWidget(Button.builder(Component.literal(">>"), sender -> setSelectionPage(this.selectionPage + 1))
+                    .bounds(this.width / 2 + 35, this.height / 2 + 80, 30, 20)
+                    .build());
                 setSelectionPage(this.selectionPage);
 
                 //search
                 EditBox searchBox = this.addRenderableWidget(new EditBox(this.font, this.width / 2 - 65, this.height / 2 - 88, 130, 16,
-                    Component.translatable("immersive_paintings.search")));
+                    Component.translatable("immersive_paintings.gui.search")));
                 searchBox.setMaxLength(64);
                 searchBox.setSuggestion("search");
                 searchBox.setResponder(s -> {
@@ -414,44 +445,44 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
 
                 int x = this.width / 2 - 200 + 12;
 
-                Button widget = this.addRenderableWidget(new TooltipButtonWidget(x + 50 + 8, this.height / 2 - 90, 25, 20,
-                    Component.literal(String.valueOf(this.filteredResolution)),
-                    Component.translatable("immersive_paintings.tooltip.filter_resolution"),
-                    v -> {}));
+                Button widget = this.addRenderableWidget(Button.builder(Component.literal(String.valueOf(this.filteredResolution)), v -> {})
+                    .bounds(x + 50 + 8, this.height / 2 - 90, 25, 20)
+                    .tooltip(Tooltip.create(Component.translatable("immersive_paintings.gui.tooltip.filter_resolution")))
+                    .build());
 
-                TooltipButtonWidget allWidget = this.addRenderableWidget(new TooltipButtonWidget(x, this.height / 2 - 90, 25, 20,
-                    Component.translatable("immersive_paintings.filter.all"),
-                    Component.translatable("immersive_paintings.tooltip.filter_resolution"),
-                    v -> {
+                Button allWidget = this.addRenderableWidget(Button.builder(Component.translatable("immersive_paintings.gui.filter_all"), v -> {
                         this.filteredResolution = 0;
                         this.updateSearch();
                         widget.setMessage(Component.literal(String.valueOf(this.filteredResolution)));
                         v.active = false;
-                    }));
+                    })
+                    .bounds(x, this.height / 2 - 90, 25, 20)
+                    .tooltip(Tooltip.create(Component.translatable("immersive_paintings.gui.tooltip.filter_resolution")))
+                    .build());
 
-                this.addRenderableWidget(new TooltipButtonWidget(x + 25 + 8, this.height / 2 - 90, 25, 20,
-                    Component.literal("<"),
-                    Component.translatable("immersive_paintings.tooltip.filter_resolution"),
-                    v -> {
+                this.addRenderableWidget(Button.builder(Component.literal("<"), v -> {
                         this.filteredResolution = this.filteredResolution == 0 ? 32 : Math.max(this.minResolution, this.filteredResolution / 2);
                         this.updateSearch();
                         widget.setMessage(Component.literal(String.valueOf(this.filteredResolution)));
                         allWidget.active = true;
-                    }));
+                    })
+                    .bounds(x + 25 + 8, this.height / 2 - 90, 25, 20)
+                    .tooltip(Tooltip.create(Component.translatable("immersive_paintings.gui.tooltip.filter_resolution")))
+                    .build());
 
-                this.addRenderableWidget(new TooltipButtonWidget(x + 75 + 8, this.height / 2 - 90, 25, 20,
-                    Component.literal(">"),
-                    Component.translatable("immersive_paintings.tooltip.filter_resolution"),
-                    v -> {
+                this.addRenderableWidget(Button.builder(Component.literal(">"), v -> {
                         this.filteredResolution = this.filteredResolution == 0 ? 32 : Math.min(this.maxResolution, this.filteredResolution * 2);
                         this.updateSearch();
                         widget.setMessage(Component.literal(String.valueOf(this.filteredResolution)));
                         allWidget.active = true;
-                    }));
+                    })
+                    .bounds(x + 75 + 8, this.height / 2 - 90, 25, 20)
+                    .tooltip(Tooltip.create(Component.translatable("immersive_paintings.gui.tooltip.filter_resolution")))
+                    .build());
 
                 //width
                 EditBox widthInput = this.addRenderableWidget(new EditBox(this.font, this.width / 2 + 80, this.height / 2 - 88, 40, 16,
-                    Component.translatable("immersive_paintings.filter_width")));
+                    Component.translatable("immersive_paintings.gui.filter_width")));
                 widthInput.setMaxLength(2);
                 widthInput.setSuggestion("width");
                 widthInput.setResponder(s -> {
@@ -466,7 +497,7 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
 
                 //height
                 EditBox heightInput = this.addRenderableWidget(new EditBox(this.font, this.width / 2 + 80 + 40, this.height / 2 - 88, 40, 16,
-                    Component.translatable("immersive_paintings.filter_height")));
+                    Component.translatable("immersive_paintings.gui.filter_height")));
                 heightInput.setMaxLength(2);
                 heightInput.setSuggestion("height");
                 heightInput.setResponder(s -> {
@@ -480,39 +511,76 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
                 });
             }
             case DELETE -> {
-                this.addRenderableWidget(new DefaultButtonWidget(this.width / 2 - 100 - 5, this.height / 2 + 20, 100, 20,
-                    Component.translatable("immersive_paintings.cancel"), v -> this.setPage(Page.YOURS)));
+                this.addRenderableWidget(Button.builder(Component.translatable("immersive_paintings.gui.cancel"), v -> this.setPage(Page.YOURS))
+                    .bounds(this.width / 2 - 100 - 5, this.height / 2 + 20, 100, 20)
+                    .build());
 
-                this.addRenderableWidget(new DefaultButtonWidget(this.width / 2 + 5, this.height / 2 + 20, 100, 20, Component.translatable("immersive_paintings.delete"), v -> {
-                    NetworkHandler.sendToServer(new PaintingDeleteRequest(this.deletePainting));
-                    this.setPage(Page.YOURS);
-                }));
+                this.addRenderableWidget(Button.builder(Component.translatable("immersive_paintings.gui.delete"), v -> {
+                        NetworkHandler.Client.sendToServer(new PaintingDeletePayload(this.deletePainting, false));
+                        this.setPage(Page.YOURS);
+                    })
+                    .bounds(this.width / 2 + 5, this.height / 2 + 20, 100, 20)
+                    .build());
             }
             case ADMIN_DELETE -> {
-                this.addRenderableWidget(new DefaultButtonWidget(this.width / 2 - 115, this.height / 2 + 10, 70, 20,
-                    Component.translatable("immersive_paintings.cancel"), v -> this.setPage(Page.PLAYERS)));
+                this.addRenderableWidget(Button.builder(Component.translatable("immersive_paintings.gui.cancel"), v -> this.setPage(Page.PLAYERS))
+                    .bounds(this.width / 2 - 115, this.height / 2 + 10, 70, 20)
+                    .build());
 
-                this.addRenderableWidget(new DefaultButtonWidget(this.width / 2 - 40, this.height / 2 + 10, 70, 20, Component.translatable("immersive_paintings.delete"), v -> {
-                    NetworkHandler.sendToServer(new PaintingDeleteRequest(deletePainting));
-                    this.setPage(Page.PLAYERS);
-                }));
+                this.addRenderableWidget(Button.builder(Component.translatable("immersive_paintings.gui.delete"), v -> {
+                        NetworkHandler.Client.sendToServer(new PaintingDeletePayload(this.deletePainting, false));
+                        this.setPage(Page.PLAYERS);
+                    })
+                    .bounds(this.width / 2 - 40, this.height / 2 + 10, 70, 20)
+                    .build());
 
-                this.addRenderableWidget(new DefaultButtonWidget(this.width / 2 + 35, this.height / 2 + 10, 70, 20, Component.translatable("immersive_paintings.delete_all"), v -> {
-                    String author = ClientPaintingManager.getPainting(this.deletePainting).author;
-                    ClientPaintingManager.getPaintings().entrySet().stream()
-                        .filter(p -> Objects.equals(p.getValue().author, author) && !p.getValue().datapack)
-                        .map(Map.Entry::getKey)
-                        .forEach(p -> NetworkHandler.sendToServer(new PaintingDeleteRequest(p)));
-                    this.setPage(Page.PLAYERS);
-                }));
+                this.addRenderableWidget(Button.builder(Component.translatable("immersive_paintings.gui.delete_all"), v -> {
+                        NetworkHandler.Client.sendToServer(new PaintingDeletePayload(this.deletePainting, true));
+                        this.setPage(Page.PLAYERS);
+                    })
+                    .bounds(this.width / 2 + 35, this.height / 2 + 10, 70, 20)
+                    .build());
             }
         }
     }
 
+    /**
+     * Copied from {@link ImmersivePaintingScreen#consolidate(List)}
+     */
+    public void updateWidget(ResourceLocation paintingLoc) {
+        if (this.paintingWidgets.containsKey(paintingLoc)) {
+            ClientPaintingManager.getPainting(paintingLoc)
+                .ifPresent(p -> this.paintingWidgets.get(paintingLoc)
+                    .update(ClientPaintingManager.getImageIdentifier(paintingLoc, Painting.Size.THUMBNAIL), p.width(), p.height()));
+        }
+    }
+
+    /**
+     * Copied from {@link ImmersivePaintingScreen#consolidate(List)}
+     */
+    private static Component consolidate(List<Component> textList) {
+        if (textList == null)
+            return null;
+
+        Component base = Component.empty();
+        MutableComponent lastTextNode = base.copy();
+
+        if (textList.isEmpty())
+            return base;
+
+        for (int i = 0; i < textList.size() - 1; i++) {
+            Component text = textList.get(i);
+            lastTextNode = lastTextNode.append(text).append("\n");
+        }
+
+        Component finalElement = textList.getLast();
+        return lastTextNode.append(finalElement);
+    }
+
     protected void rebuildPaintings() {
-        for (PaintingWidget w : this.paintingWidgetList)
+        for (PaintingWidget w : this.paintingWidgets.values())
             this.removeWidget(w);
-        this.paintingWidgetList.clear();
+        this.paintingWidgets.clear();
 
         // paintings
         for (int y = 0; y < 3; y++) {
@@ -520,27 +588,34 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
                 int i = y * 8 + x + this.selectionPage * 24;
                 if (i >= 0 && i < this.filteredPaintings.size()) {
                     ResourceLocation paintingLoc = this.filteredPaintings.get(i);
-                    Painting painting = ClientPaintingManager.getPainting(paintingLoc);
-
-                    //tooltip
                     List<Component> tooltip = new LinkedList<>();
-                    tooltip.add(Component.literal(painting.name));
-                    tooltip.add(Component.translatable("immersive_paintings.by_author", painting.author).withStyle(ChatFormatting.ITALIC));
-                    tooltip.add(Component.translatable("immersive_paintings.resolution", painting.width, painting.height, painting.resolution)
-                        .withStyle(ChatFormatting.ITALIC));
 
-                    if (this.page == Page.YOURS && painting.hidden) {
-                        tooltip.add(Component.translatable("immersive_paintings.hidden").withStyle(ChatFormatting.ITALIC)
-                            .withStyle(ChatFormatting.GRAY));
+                    Optional<Painting> paintingOp = ClientPaintingManager.getPainting(paintingLoc);
+                    if (paintingOp.isPresent()) {
+                        Painting painting = paintingOp.get();
+                        //tooltip
+                        tooltip.add(Component.literal(painting.name()));
+                        tooltip.add(Component.translatable("immersive_paintings.gui.by_author", painting.author()).withStyle(ChatFormatting.ITALIC));
+                        tooltip.add(Component.translatable("immersive_paintings.gui.resolution", painting.width(), painting.height(), painting.resolution())
+                            .withStyle(ChatFormatting.ITALIC));
+
+                        if (this.page == Page.YOURS && painting.has(Painting.Flag.HIDDEN)) {
+                            tooltip.add(Component.translatable("immersive_paintings.gui.hidden").withStyle(ChatFormatting.ITALIC)
+                                .withStyle(ChatFormatting.GRAY));
+                        }
+                        if (this.page == Page.YOURS && painting.has(Painting.Flag.NSFW)) {
+                            tooltip.add(Component.translatable("immersive_paintings.gui.nsfw").withStyle(ChatFormatting.ITALIC)
+                                .withStyle(ChatFormatting.GRAY));
+                        }
+
+                        if (this.page == Page.YOURS || page == Page.PLAYERS && this.isOp()) {
+                            tooltip.add(Component.translatable("immersive_paintings.right_click_to_delete")
+                                .withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY));
+                        }
                     }
 
-                    if (this.page == Page.YOURS || page == Page.PLAYERS && this.isOp()) {
-                        tooltip.add(Component.translatable("immersive_paintings.right_click_to_delete")
-                            .withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY));
-                    }
-
-                    this.paintingWidgetList.add(this.addRenderableWidget(new PaintingWidget(ClientPaintingManager.getPaintingTexture(paintingLoc, Painting.Type.THUMBNAIL),
-                        (int) (width / 2 + (x - 3.5) * 48) - 24, height / 2 - 66 + y * 48, 46, 46,
+                    PaintingWidget paintingWidget = this.addRenderableWidget(new PaintingWidget(
+                        (int) (this.width / 2 + (x - 3.5) * 48) - 24, this.height / 2 - 66 + y * 48, 46, 46,
                         sender -> {
                             if (this.canUpdateFlag())
                                 this.updateFlag(paintingLoc);
@@ -554,8 +629,11 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
                                 this.deletePainting = paintingLoc;
                                 this.setPage(Page.ADMIN_DELETE);
                             }
-                        },
-                        () -> tooltip.stream().map(Component::getVisualOrderText).toList())));
+                        }
+                    ));
+                    paintingWidget.setTooltip(Tooltip.create(consolidate(tooltip)));
+                    this.paintingWidgets.put(paintingLoc, paintingWidget);
+                    this.updateWidget(paintingLoc);
                 } else {
                     break;
                 }
@@ -564,42 +642,39 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
     }
 
     protected void rebuildScreenshots() {
-        for (PaintingWidget w : this.paintingWidgetList)
+        for (PaintingWidget w : this.paintingWidgets.values())
             this.removeWidget(w);
-        this.paintingWidgetList.clear();
+        this.paintingWidgets.clear();
 
         // screenshots
         for (int x = 0; x < SCREENSHOTS_PER_PAGE; x++) {
             int i = x + this.screenshotPage * SCREENSHOTS_PER_PAGE;
             if (i >= 0 && i < this.screenshots.size()) {
                 File file = this.screenshots.get(i);
-                Painting painting = new Painting(null, 16, 16, 16, false, true);
-                this.paintingWidgetList.add(this.addRenderableWidget(new PaintingWidget(painting.thumbnail,
+
+                PaintingWidget paintingWidget = this.addRenderableWidget(new PaintingWidget(
                     (this.width / 2 + (x - SCREENSHOTS_PER_PAGE / 2) * 68) - 32, this.height / 2 + 15, 64, 48,
                     b -> {
-                        this.currentImage = ((PaintingWidget) b).thumbnail.image;
+                        this.currentImage = ((PaintingWidget) b).getImage();
                         if (this.currentImage != null) {
                             currentImagePixelZoomCache = -1;
                             this.currentImageName = file.getName();
-                            this.settings = PixelatorSettingsAccessor.callInit(this.currentImage);
+                            this.settings = PixelatorSettingsAccessor.callInit(this.currentImage, this.minResolution, this.maxResolution);
                             this.setPage(Page.CREATE);
                             this.pixelateImage();
                         }
                     },
-                    b -> {},
-                    () -> Tooltip.splitTooltip(Minecraft.getInstance(), Component.literal(file.getName())))));
-
+                    b -> {}
+                ));
+                paintingWidget.setTooltip(Tooltip.create(Component.literal(file.getName())));
                 ResourceLocation loc = Main.locate("screenshot_" + x);
-                Runnable task = () -> {
-                    ByteImage image = this.loadImage(file.getPath(), loc);
-                    if (image != null) {
-                        painting.width = image.getWidth();
-                        painting.height = image.getHeight();
-                        painting.thumbnail.image = image;
-                        painting.thumbnail.textureIdentifier = loc;
-                    }
-                };
-                this.service.submit(task);
+                this.paintingWidgets.put(loc, paintingWidget);
+
+                service.submit(() -> {
+                    BufferedImage image = this.loadImage(file.getPath(), loc);
+                    if (image != null)
+                        paintingWidget.update(loc, image);
+                });
             } else {
                 break;
             }
@@ -626,17 +701,25 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
         int maxWidth = this.getConfigWidth();
         int maxHeight = this.getConfigHeight();
 
-        String playerName = this.getPlayerName();
+        LocalPlayer player = Minecraft.getInstance().player;
+        UUID uuid = player == null ? null : player.getUUID();
+        boolean isOp = this.isOp();
         this.filteredPaintings.addAll(ClientPaintingManager.getPaintings().entrySet().stream()
-            .filter(v -> this.page != Page.YOURS || Objects.equals(v.getValue().author, playerName) && !v.getValue().datapack)
-            .filter(v -> this.page != Page.PLAYERS || !v.getValue().datapack && !v.getValue().hidden)
-            .filter(v -> this.page != Page.DATAPACKS || v.getValue().datapack)
-            .filter(v -> v.getKey().toString().contains(this.filteredString))
-            .filter(v -> this.filteredResolution == 0 || v.getValue().resolution == this.filteredResolution)
-            .filter(v -> this.filteredWidth == 0 || v.getValue().width == this.filteredWidth)
-            .filter(v -> this.filteredHeight == 0 || v.getValue().height == this.filteredHeight)
-            .filter(v -> maxWidth == 0 || v.getValue().width <= maxWidth)
-            .filter(v -> maxHeight == 0 || v.getValue().height <= maxHeight)
+            .filter(entry -> {
+                Painting painting = entry.getValue();
+                return (
+                    (this.page == Page.YOURS && !painting.is(Painting.Type.DATAPACK) && painting.authorUUID().equals(uuid)) ||
+                    (this.page == Page.PLAYERS && !painting.is(Painting.Type.DATAPACK) && (!painting.has(Painting.Flag.HIDDEN) || isOp) && (!painting.has(Painting.Flag.NSFW) || Configs.CLIENT.showNSFWPaintings || isOp)) ||
+                    (this.page == Page.DATAPACKS && painting.is(Painting.Type.DATAPACK))
+                ) &&
+                    entry.getKey().toString().contains(this.filteredString) &&
+                    (this.filteredResolution == 0 || painting.resolution() == this.filteredResolution) &&
+                    (this.filteredWidth == 0 || painting.width() == this.filteredWidth) &&
+                    (this.filteredHeight == 0 || painting.height() == this.filteredHeight) &&
+                    (maxWidth == 0 || painting.width() <= maxWidth) &&
+                    (maxHeight == 0 || painting.height() <= maxHeight);
+            })
+            .sorted(Comparator.comparing(p -> p.getValue().name()))
             .map(Map.Entry::getKey)
             .toList());
 
@@ -645,10 +728,6 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
 
     protected abstract int getConfigWidth();
     protected abstract int getConfigHeight();
-
-    protected String getPlayerName() {
-        return Minecraft.getInstance().player == null ? "" : Minecraft.getInstance().player.getGameProfile().getName();
-    }
 
     protected boolean isOp() {
         return Minecraft.getInstance().player != null && Minecraft.getInstance().player.hasPermissions(4);
@@ -683,13 +762,13 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
         currentImagePixelZoomCache = -1;
         if (this.currentImage != null) {
             this.currentImageName = FilenameUtils.getBaseName(path).replaceFirst("[.][^.]+$", "");
-            this.settings = PixelatorSettingsAccessor.callInit(this.currentImage);
+            this.settings = PixelatorSettingsAccessor.callInit(this.currentImage, this.minResolution, this.maxResolution);
             this.setPage(Page.CREATE);
             this.pixelateImage();
         }
     }
 
-    protected ByteImage loadImage(String path, ResourceLocation loc) {
+    protected BufferedImage loadImage(String path, ResourceLocation loc) {
         InputStream stream = null;
         try {
             stream = new URL(path).openStream();
@@ -697,25 +776,25 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
             try {
                 stream = new FileInputStream(path);
             } catch (Exception e) {
-                e.printStackTrace();
+                BetsyRoss.LOGGER.error("failed loading image {} from path {}", loc, path, e);
             }
         }
 
         if (stream != null) {
             try {
-                ByteImage nativeImage = ByteImage.read(stream);
-                Minecraft.getInstance().getTextureManager().register(loc, new DynamicTexture(ClientUtils.byteImageToNativeImage(nativeImage)));
+                BufferedImage nativeImage = ImageIO.read(stream);
+                Minecraft.getInstance().getTextureManager().register(loc, new DynamicTexture(ImageManipulations.bufferedToNative(nativeImage)));
                 stream.close();
                 return nativeImage;
             } catch (IOException e) {
-                e.printStackTrace();
+                BetsyRoss.LOGGER.error("failed decoding image {} from path {}", loc, path, e);
             }
         }
 
         return null;
     }
 
-    protected static int getCurrentImagePixelZoomCache(ByteImage currentImage) {
+    protected static int getCurrentImagePixelZoomCache(BufferedImage currentImage) {
         if (currentImagePixelZoomCache < 0)
             currentImagePixelZoomCache = ImageManipulations.scanForPixelArtMultiple(currentImage);
         return currentImagePixelZoomCache;
@@ -733,14 +812,14 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
     }
 
     @Override
-    public void onReceivePaintingResponse(RegisterPaintingResponse response) {
-        if (response.error.isEmpty()) {
-            if (this.canUpdateFlag())
-                this.updateFlag(BetsyRossUtils.location(response.identifier));
+    public void onReceivePaintingResponse(PaintingRegisterErrorPayload response) {
+        if (response.error().isEmpty()) {
+            if (this.canUpdateFlag() && response.identifier().isPresent())
+                this.updateFlag(response.identifier().get());
             this.onClose();
         } else {
-            this.setPage(ImmersivePaintingScreen.Page.CREATE);
-            this.setError(Component.translatable("immersive_paintings.error." + response.error));
+            this.setPage(Page.CREATE);
+            this.setError(Component.translatable("immersive_paintings.error." + response.error()));
         }
     }
 

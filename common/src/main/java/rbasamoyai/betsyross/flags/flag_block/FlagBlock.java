@@ -4,14 +4,14 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import immersive_paintings.Config;
+import net.conczin.immersive_paintings.registration.Configs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -80,12 +80,11 @@ public class FlagBlock extends Block implements EntityBlock, SimpleWaterloggedBl
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (!(level.getBlockEntity(pos) instanceof FlagBlockEntity flag))
-            return super.use(state, level, pos, player, hand, result);
+            return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
         if (level.isClientSide || !(player instanceof ServerPlayer splayer) || splayer.gameMode.getGameModeForPlayer() == GameType.ADVENTURE)
-            return InteractionResult.SUCCESS;
-        ItemStack stack = player.getItemInHand(hand);
+            return ItemInteractionResult.SUCCESS;
         boolean sneaking = player.isShiftKeyDown();
         boolean emptyFlagPole = flag.getFlagPole().isAir();
         if (stack.isEmpty() && !emptyFlagPole && !sneaking) {
@@ -94,7 +93,7 @@ public class FlagBlock extends Block implements EntityBlock, SimpleWaterloggedBl
             level.playSound(null, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 1.0f, 1.0f);
             if (!player.isCreative())
                 player.addItem(oldFlagpole.getBlock().getCloneItemStack(level, pos, oldFlagpole));
-            return InteractionResult.CONSUME;
+            return ItemInteractionResult.CONSUME;
         } else if (stack.getItem() instanceof BlockItem item) {
             if (emptyFlagPole && isFlagpole(item.getBlock()) && !sneaking) {
                 BlockState state1 = item.getBlock().defaultBlockState();
@@ -103,15 +102,15 @@ public class FlagBlock extends Block implements EntityBlock, SimpleWaterloggedBl
                 level.playSound(null, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
                 if (!player.isCreative())
                     stack.shrink(1);
-                return InteractionResult.CONSUME;
+                return ItemInteractionResult.CONSUME;
             } else {
-                return super.use(state, level, pos, player, hand, result);
+                return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
             }
         }
-        Config config = Config.getInstance();
-        BetsyRossNetwork.sendToPlayer(splayer, new ClientboundOpenFlagBlockScreenPacket(pos, config.minPaintingResolution,
-            config.maxPaintingResolution, config.showOtherPlayersPaintings, config.uploadPermissionLevel));
-        return InteractionResult.CONSUME;
+        BetsyRossNetwork.sendToPlayer(splayer, new ClientboundOpenFlagBlockScreenPacket(pos,
+            Configs.COMMON.minPaintingResolution, Configs.COMMON.maxPaintingResolution,
+            Configs.COMMON.showOtherPlayersPaintings, Configs.COMMON.uploadPermissionLevel));
+        return ItemInteractionResult.CONSUME;
     }
 
     @Override
@@ -130,7 +129,7 @@ public class FlagBlock extends Block implements EntityBlock, SimpleWaterloggedBl
         return block.defaultBlockState().is(BetsyRossTags.FLAGPOLE);
     }
 
-    public static Properties properties() {
+    public static Properties blockProperties() {
         return Properties.of().sound(SoundType.WOOL).mapColor(MapColor.WOOL).noCollission().noOcclusion().instabreak();
     }
 

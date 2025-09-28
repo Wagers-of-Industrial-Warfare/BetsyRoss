@@ -5,6 +5,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.betsyross.BetsyRossClient;
 import rbasamoyai.betsyross.config.BetsyRossConfig;
+import rbasamoyai.betsyross.content.BetsyRossDataComponents;
 import rbasamoyai.betsyross.content.BetsyRossItems;
 import rbasamoyai.betsyross.flags.AbstractFlagScreen;
 import rbasamoyai.betsyross.network.ServerboundSyncEmbroideryTableDataPacket;
@@ -52,7 +53,7 @@ public class EmbroideryTableScreen extends AbstractFlagScreen {
     @Override
     protected void updateFlag(ResourceLocation loc) {
         ItemStack itemStack = this.getTargetedItemStack();
-        itemStack.getOrCreateTag().putString("FlagId", loc.toString());
+        itemStack.set(BetsyRossDataComponents.FLAG_ID.get(), loc);
         BetsyRossClient.sendToServer(new ServerboundSyncEmbroideryTableDataPacket(this.selected, loc));
     }
 

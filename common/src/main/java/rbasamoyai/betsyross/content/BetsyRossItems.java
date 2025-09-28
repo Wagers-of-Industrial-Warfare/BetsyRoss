@@ -20,13 +20,18 @@ public class BetsyRossItems {
 
     public static final Supplier<FlagBlockItem> FLAG_ITEM = register("flag_block",
         () -> new FlagBlockItem(BetsyRossBlocks.FLAG_BLOCK.get(), BetsyRossBlocks.DRAPED_FLAG_BLOCK.get(),
-            new Item.Properties()));
+            new Item.Properties().component(BetsyRossDataComponents.FLAG_ID.get(), BetsyRoss.DEFAULT_FLAG)));
     public static final Supplier<StandardItem> FLAG_STANDARD = register("flag_standard",
-        () -> new StandardItem(new Item.Properties().stacksTo(1)));
+        () -> new StandardItem(new Item.Properties().stacksTo(1)
+            .component(BetsyRossDataComponents.FLAG_ID.get(), BetsyRoss.DEFAULT_FLAG)
+            .component(BetsyRossDataComponents.RAISED.get(), false)));
     public static final Supplier<StandardItem> BANNER_STANDARD = register("banner_standard",
-        () -> new StandardItem(new Item.Properties().stacksTo(1)));
+        () -> new StandardItem(new Item.Properties().stacksTo(1)
+            .component(BetsyRossDataComponents.FLAG_ID.get(), BetsyRoss.DEFAULT_FLAG)
+            .component(BetsyRossDataComponents.RAISED.get(), false)));
     public static final Supplier<ArmorBannerItem> ARMOR_BANNER = register("armor_banner",
-        () -> new ArmorBannerItem(new Item.Properties().stacksTo(1)));
+        () -> new ArmorBannerItem(new Item.Properties().stacksTo(1)
+            .component(BetsyRossDataComponents.FLAG_ID.get(), BetsyRoss.DEFAULT_FLAG)));
     public static final Supplier<BlockItem> EMBROIDERY_TABLE_ITEM = register("embroidery_table",
         () -> new BlockItem(BetsyRossBlocks.EMBROIDERY_TABLE_BLOCK.get(), new Item.Properties()));
 

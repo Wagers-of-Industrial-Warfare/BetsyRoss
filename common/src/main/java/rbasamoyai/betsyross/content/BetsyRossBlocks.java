@@ -17,9 +17,9 @@ public class BetsyRossBlocks {
 
     private static final Map<String, Supplier<? extends Block>> ENTRIES = new LinkedHashMap<>();
 
-    public static final Supplier<FlagBlock> FLAG_BLOCK = register("flag_block", () -> new FlagBlock(FlagBlock.properties()));
-    public static final Supplier<DrapedFlagBlock> DRAPED_FLAG_BLOCK = register("draped_flag_block", () -> new DrapedFlagBlock(FlagBlock.properties()));
-    public static final Supplier<EmbroideryTableBlock> EMBROIDERY_TABLE_BLOCK = register("embroidery_table", () -> new EmbroideryTableBlock(EmbroideryTableBlock.properties()));
+    public static final Supplier<FlagBlock> FLAG_BLOCK = register("flag_block", () -> new FlagBlock(FlagBlock.blockProperties()));
+    public static final Supplier<DrapedFlagBlock> DRAPED_FLAG_BLOCK = register("draped_flag_block", () -> new DrapedFlagBlock(FlagBlock.blockProperties()));
+    public static final Supplier<EmbroideryTableBlock> EMBROIDERY_TABLE_BLOCK = register("embroidery_table", () -> new EmbroideryTableBlock(EmbroideryTableBlock.blockProperties()));
 
     private static <T extends Block> Supplier<T> register(String id, Supplier<T> block) {
         if (ENTRIES.containsKey(id))

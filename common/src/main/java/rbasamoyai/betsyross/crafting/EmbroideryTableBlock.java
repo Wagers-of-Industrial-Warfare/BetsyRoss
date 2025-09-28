@@ -1,11 +1,11 @@
 package rbasamoyai.betsyross.crafting;
 
-import immersive_paintings.Config;
+import net.conczin.immersive_paintings.registration.Configs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -34,15 +34,15 @@ public class EmbroideryTableBlock extends Block {
 
 	public EmbroideryTableBlock(Properties properties) { super(properties); }
 
-	@Override
-	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
 		if (hand == InteractionHand.MAIN_HAND) {
             ItemStack itemStack = player.getItemInHand(hand);
             if (isValidEmbroideryTableItem(itemStack)) {
                 if (player instanceof ServerPlayer splayer) {
-                    Config config = Config.getInstance();
                     BetsyRossNetwork.sendToPlayer(splayer, new ClientboundOpenEmbroideryTableScreenPacket(player.getInventory().selected,
-                        config.minPaintingResolution, config.maxPaintingResolution, config.showOtherPlayersPaintings, config.uploadPermissionLevel));
+                        Configs.COMMON.minPaintingResolution, Configs.COMMON.maxPaintingResolution,
+                        Configs.COMMON.showOtherPlayersPaintings, Configs.COMMON.uploadPermissionLevel));
                     player.awardStat(BetsyRossStats.INTERACT_WITH_EMBROIDERY_TABLE);
                 }
             } else if (isInvalidFlagItem(itemStack)) {
@@ -50,12 +50,12 @@ public class EmbroideryTableBlock extends Block {
             } else {
                 player.displayClientMessage(Component.translatable("gui.betsyross.embroidery_table.invalid_item"), true);
             }
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
 		}
-        return super.use(state, level, pos, player, hand, result);
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
 	}
 
-	public static Properties properties() {
+	public static Properties blockProperties() {
 		return Properties.of().strength(2.5F).sound(SoundType.WOOD).mapColor(MapColor.WOOD);
 	}
 

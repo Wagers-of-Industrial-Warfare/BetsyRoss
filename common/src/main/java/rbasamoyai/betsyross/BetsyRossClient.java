@@ -1,6 +1,7 @@
 package rbasamoyai.betsyross;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -8,8 +9,8 @@ import java.util.function.Supplier;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import immersive_paintings.resources.ClientPaintingManager;
-import immersive_paintings.resources.Painting;
+import net.conczin.immersive_paintings.ClientPaintingManager;
+import net.conczin.immersive_paintings.Painting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
@@ -137,12 +138,13 @@ public class BetsyRossClient {
     }
 
     public static FlagRenderInfo getFlagRenderInfo(ResourceLocation location) {
-        Painting painting = ClientPaintingManager.getPaintings().get(location);
-        if (painting == null) {
-            painting = ClientPaintingManager.getPainting(BetsyRoss.DEFAULT_FLAG);
-            location = BetsyRoss.DEFAULT_FLAG;
+        Optional<Painting> paintingOp = ClientPaintingManager.getPainting(BetsyRoss.DEFAULT_FLAG);
+        if (paintingOp.isPresent()) {
+            Painting painting = paintingOp.get();
+            return new FlagRenderInfo(location, painting.width(), painting.height());
+        } else {
+            return new FlagRenderInfo(BetsyRoss.DEFAULT_FLAG, 1, 1);
         }
-        return new FlagRenderInfo(location, painting.width, painting.height);
     }
 
     public record FlagRenderInfo(ResourceLocation location, int width, int height) {
@@ -151,11 +153,9 @@ public class BetsyRossClient {
     public static AABB getFlagBlockEntityBox(FlagBlockEntity flag) {
         BlockState state = flag.getBlockState();
         BlockPos pos = flag.getBlockPos();
-        Painting painting = ClientPaintingManager.getPaintings().get(flag.getFlagId());
-        if (painting == null)
-            painting = ClientPaintingManager.getPainting(BetsyRoss.DEFAULT_FLAG);
-        int flagWidth = painting.width;
-        int flagHeight = painting.height;
+        FlagRenderInfo info = getFlagRenderInfo(flag.getFlagId());
+        int flagWidth = info.width;
+        int flagHeight = info.height;
         if (state.is(BetsyRossBlocks.FLAG_BLOCK.get())) {
             float dir = RotationSegment.convertToDegrees(state.getValue(FlagBlock.ROTATION));
             float f1 = Mth.sin(dir * Mth.DEG_TO_RAD);
@@ -164,7 +164,7 @@ public class BetsyRossClient {
         }
         if (state.is(BetsyRossBlocks.DRAPED_FLAG_BLOCK.get())) {
             Direction dir = state.getValue(DrapedFlagBlock.FACING);
-            return new AABB(pos.relative(dir.getOpposite()), pos.below(flagHeight).relative(dir.getCounterClockWise(), flagWidth)).inflate(1);
+            return AABB.encapsulatingFullBlocks(pos.relative(dir.getOpposite()), pos.below(flagHeight).relative(dir.getCounterClockWise(), flagWidth)).inflate(1);
         }
         return new AABB(pos);
     }

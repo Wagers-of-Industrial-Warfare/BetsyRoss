@@ -34,10 +34,10 @@ public class ScrollTextWidget extends AbstractWidget {
 		poseStack.popPose();
 	}
 
-	@Override
-	public boolean mouseScrolled(double pMouseX, double pMouseY, double pDelta) {
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
 		if (this.isHovered()) {
-			this.value = (byte) Mth.clamp((float) this.value + pDelta, (float) this.minValue, (float) maxValue);
+			this.value = (byte) Mth.clamp((float) this.value + scrollY, (float) this.minValue, (float) maxValue);
 			return true;
 		}
 		return false;

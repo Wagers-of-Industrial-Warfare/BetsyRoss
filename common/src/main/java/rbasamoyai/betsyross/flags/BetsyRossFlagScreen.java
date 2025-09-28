@@ -1,10 +1,10 @@
 package rbasamoyai.betsyross.flags;
 
-import immersive_paintings.network.s2c.RegisterPaintingResponse;
+import net.conczin.immersive_paintings.network.payload.s2c.PaintingRegisterErrorPayload;
 
 public interface BetsyRossFlagScreen {
 
-    void onReceivePaintingResponse(RegisterPaintingResponse response);
+    void onReceivePaintingResponse(PaintingRegisterErrorPayload response);
     void refreshPage();
 
 }
