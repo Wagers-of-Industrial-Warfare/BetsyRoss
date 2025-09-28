@@ -6,7 +6,6 @@ import rbasamoyai.betsyross.BetsyRoss;
 
 public class BetsyRossServices {
 
-    public static final IEnvExecute CLIENT_EXECUTOR = load(IEnvExecute.class);
     public static final IIndexPlatform INDEX_PLATFORM = load(IIndexPlatform.class);
 
     /**

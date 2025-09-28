@@ -38,8 +38,6 @@ import rbasamoyai.betsyross.flags.flag_block.FlagBlockEntityRenderer;
 import rbasamoyai.betsyross.flags.standards.ArmorBannerRenderer;
 import rbasamoyai.betsyross.flags.standards.BannerStandardRenderer;
 import rbasamoyai.betsyross.flags.standards.FlagStandardRenderer;
-import rbasamoyai.betsyross.network.BetsyRossNetwork;
-import rbasamoyai.betsyross.network.CommonPacket;
 import rbasamoyai.betsyross.platform.BetsyRossClientServices;
 
 public class BetsyRossClient {
@@ -111,13 +109,6 @@ public class BetsyRossClient {
         cons.accept(ITEM_FLAGPOLE, FlagStandardRenderer::defineFlagpole);
         cons.accept(ITEM_BANNER, BannerStandardRenderer::defineBannerBar);
         cons.accept(ARMOR_FLAGPOLE, ArmorBannerRenderer::defineArmorFlagpole);
-    }
-
-    public static void sendToServer(CommonPacket packet) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.getConnection() == null)
-            return;
-        BetsyRossNetwork.sendToServer(mc.getConnection()::send, packet);
     }
 
     public static boolean renderCustomItem(BlockEntityWithoutLevelRenderer original, ItemStack stack, ItemDisplayContext transform,

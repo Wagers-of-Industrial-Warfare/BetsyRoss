@@ -20,8 +20,8 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import rbasamoyai.betsyross.content.BetsyRossItems;
 import rbasamoyai.betsyross.content.BetsyRossStats;
-import rbasamoyai.betsyross.network.BetsyRossNetwork;
-import rbasamoyai.betsyross.network.ClientboundOpenEmbroideryTableScreenPacket;
+import rbasamoyai.betsyross.network.BetsyRossNetworkHandler;
+import rbasamoyai.betsyross.network.s2c.S2COpenEmbroideryTableScreenPayload;
 
 public class EmbroideryTableBlock extends Block {
 
@@ -40,7 +40,7 @@ public class EmbroideryTableBlock extends Block {
             ItemStack itemStack = player.getItemInHand(hand);
             if (isValidEmbroideryTableItem(itemStack)) {
                 if (player instanceof ServerPlayer splayer) {
-                    BetsyRossNetwork.sendToPlayer(splayer, new ClientboundOpenEmbroideryTableScreenPacket(player.getInventory().selected,
+                    BetsyRossNetworkHandler.sendToClient(splayer, new S2COpenEmbroideryTableScreenPayload(player.getInventory().selected,
                         Configs.COMMON.minPaintingResolution, Configs.COMMON.maxPaintingResolution,
                         Configs.COMMON.showOtherPlayersPaintings, Configs.COMMON.uploadPermissionLevel));
                     player.awardStat(BetsyRossStats.INTERACT_WITH_EMBROIDERY_TABLE);

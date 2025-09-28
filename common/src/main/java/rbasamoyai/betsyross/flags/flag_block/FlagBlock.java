@@ -43,8 +43,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import rbasamoyai.betsyross.content.BetsyRossBlocks;
-import rbasamoyai.betsyross.network.BetsyRossNetwork;
-import rbasamoyai.betsyross.network.ClientboundOpenFlagBlockScreenPacket;
+import rbasamoyai.betsyross.network.BetsyRossNetworkHandler;
+import rbasamoyai.betsyross.network.s2c.S2COpenFlagBlockScreenPayload;
 import rbasamoyai.betsyross.tags.BetsyRossTags;
 
 public class FlagBlock extends Block implements EntityBlock, SimpleWaterloggedBlock {
@@ -111,7 +111,7 @@ public class FlagBlock extends Block implements EntityBlock, SimpleWaterloggedBl
                 return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
             }
         }
-        BetsyRossNetwork.sendToPlayer(splayer, new ClientboundOpenFlagBlockScreenPacket(pos,
+        BetsyRossNetworkHandler.sendToClient(splayer, new S2COpenFlagBlockScreenPayload(pos,
             Configs.COMMON.minPaintingResolution, Configs.COMMON.maxPaintingResolution,
             Configs.COMMON.showOtherPlayersPaintings, Configs.COMMON.uploadPermissionLevel));
         return ItemInteractionResult.CONSUME;

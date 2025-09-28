@@ -2,10 +2,10 @@ package rbasamoyai.betsyross.flags.flag_block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-import rbasamoyai.betsyross.BetsyRossClient;
 import rbasamoyai.betsyross.config.BetsyRossConfig;
 import rbasamoyai.betsyross.flags.AbstractFlagScreen;
-import rbasamoyai.betsyross.network.ServerboundModifyFlagBlockPacket;
+import rbasamoyai.betsyross.network.BetsyRossNetworkHandler;
+import rbasamoyai.betsyross.network.c2s.C2SModifyFlagBlockPayload;
 
 public class FlagBlockScreen extends AbstractFlagScreen {
 
@@ -20,7 +20,7 @@ public class FlagBlockScreen extends AbstractFlagScreen {
 
     protected void updateFlag(ResourceLocation loc) {
         this.flagBlockEntity.setFlag(loc);
-        BetsyRossClient.sendToServer(new ServerboundModifyFlagBlockPacket(this.blockPos, loc));
+        BetsyRossNetworkHandler.Client.sendToServer(new C2SModifyFlagBlockPayload(this.blockPos, loc));
     }
 
     @Override protected int getConfigWidth() { return BetsyRossConfig.SERVER.flagBlockMaxWidth; }
