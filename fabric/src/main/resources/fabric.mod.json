@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "id": "betsyross",
+  "id": "${mod_id}",
   "version": "${version}",
 
   "name": "Betsy Ross",
-  "description": "Large flags with images across the internets",
+  "description": "${description}",
   "authors": [],
   "contact": {},
 
@@ -21,14 +21,16 @@
     ]
   },
   "mixins": [
-    "betsyross.mixins.json",
-    "betsyross-common.mixins.json"
+    "${mod_id}.mixins.json",
+    "${mod_id}-common.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.15.7",
-    "minecraft": ">=1.20.1",
-    "immersive_paintings": ">=${immersive_paintings_requirement}",
-    "fzzy_config": ">=${fzzy_config_requirement}"
+    "java": ">=${java_version}",
+    "minecraft": ">=${minecraft_version}",
+    "fabric-api": "*",
+    "fabricloader": ">=${fabric_loader_version}",
+    "immersive_paintings": ">=${immersive_paintings_fabric_requirement}",
+    "fzzy_config": ">=${fzzy_config_fabric_requirement}"
   },
   "breaks": {
     "trinkets": "<${trinkets_breaking}"
