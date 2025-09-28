@@ -20,16 +20,14 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.resources.model.Material;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import rbasamoyai.betsyross.BetsyRoss;
 import rbasamoyai.betsyross.BetsyRossClient;
+import rbasamoyai.betsyross.content.BetsyRossDataComponents;
 import rbasamoyai.betsyross.flags.flag_block.FlagAnimationDetail;
-import rbasamoyai.betsyross.foundation.BetsyRossUtils;
 
 public class BannerStandardRenderer extends BlockEntityWithoutLevelRenderer {
 	public static final Material STANDARD_FLAGPOLE = FlagStandardRenderer.STANDARD_FLAGPOLE;
@@ -47,16 +45,14 @@ public class BannerStandardRenderer extends BlockEntityWithoutLevelRenderer {
 	public void renderByItem(ItemStack stack, ItemDisplayContext transform, PoseStack posestack, MultiBufferSource buffers, int light, int overlay) {
 		Minecraft mc = Minecraft.getInstance();
 
-		CompoundTag flagData = stack.getOrCreateTag();
-        String idString = flagData.contains("FlagId", Tag.TAG_STRING) ? flagData.getString("FlagId") : BetsyRoss.DEFAULT_FLAG.toString();
-        ResourceLocation flagId = ResourceLocation.isValidResourceLocation(idString) ? BetsyRossUtils.location(idString) : BetsyRoss.DEFAULT_FLAG;
+        ResourceLocation flagId = stack.getOrDefault(BetsyRossDataComponents.FLAG_ID.get(), BetsyRoss.DEFAULT_FLAG);
         BetsyRossClient.FlagRenderInfo renderInfo = BetsyRossClient.getFlagRenderInfo(flagId);
         int width = renderInfo.width();
         int height = renderInfo.height();
 
-		posestack.pushPose();
+        posestack.pushPose();
 
-        float pt = mc.isPaused() ? mc.getDeltaFrameTime() : mc.getFrameTime();
+        float pt = mc.getTimer().getGameTimeDeltaPartialTick(true);
 
 		if (transform == ItemDisplayContext.GUI) {
 			width = 1;

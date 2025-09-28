@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -32,6 +33,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class DrapedFlagBlock extends HorizontalDirectionalBlock implements EntityBlock, SimpleWaterloggedBlock {
 
 	public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+
+    private static final MapCodec<DrapedFlagBlock> CODEC = simpleCodec(DrapedFlagBlock::new);
 
 	/** Taken from {@link WallBannerBlock} */
 	private static final Map<Direction, VoxelShape> SHAPES = Maps.newEnumMap(ImmutableMap.of(
@@ -92,5 +95,7 @@ public class DrapedFlagBlock extends HorizontalDirectionalBlock implements Entit
     public boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
         return true;
     }
+
+    @Override protected MapCodec<? extends HorizontalDirectionalBlock> codec() { return CODEC; }
 
 }

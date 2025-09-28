@@ -1,16 +1,16 @@
 package rbasamoyai.betsyross.flags.flag_block;
 
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
+import java.util.Optional;
+
 import org.joml.Vector3f;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
-import immersive_paintings.Config;
-import immersive_paintings.resources.ClientPaintingManager;
-import immersive_paintings.resources.Painting;
+import net.conczin.immersive_paintings.ClientPaintingManager;
+import net.conczin.immersive_paintings.Painting;
+import net.conczin.immersive_paintings.registration.Configs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -23,6 +23,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RotationSegment;
 import net.minecraft.world.phys.Vec3;
+import rbasamoyai.betsyross.BetsyRoss;
 import rbasamoyai.betsyross.BetsyRossClient;
 import rbasamoyai.betsyross.config.BetsyRossConfig;
 import rbasamoyai.betsyross.content.BetsyRossBlocks;
@@ -102,7 +103,7 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 
 		stack.translate(0, 0, flip ? -0.01 : 0.01);
 
-		VertexConsumer vcons = buffers.getBuffer(getFlagBuffer(flagId, distance));
+		VertexConsumer vcons = buffers.getBuffer(RenderType.entityTranslucentCull(getFlagLocation(flagId, distance)));
 		switch (detail) {
 			case NO_WAVE -> renderSimple(vcons, stack, width, height, packedLight, packedOverlay, flip, isItem);
 			case WAVE -> renderWaveSimple(vcons, stack, partialTicks, width, height, packedLight, packedOverlay, flip);
@@ -124,40 +125,35 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 			stack.translate(v3f1.x() - w, v3f1.y(), v3f1.z());
 		}
 
-		Matrix4f pose = stack.last().pose();
-        Matrix3f normal = isItem ? new Matrix3f() : stack.last().normal();
+        PoseStack.Pose pose = stack.last();
 
-		vcons.vertex(pose, 0, 0, 0)
-				.color(255, 255, 255, 255)
-				.uv(flip ? 0 : 1, 0)
-				.overlayCoords(overlay)
-				.uv2(light)
-				.normal(normal, nx, ny, nz)
-				.endVertex();
+		vcons.addVertex(pose, 0, 0, 0)
+				.setColor(255, 255, 255, 255)
+				.setUv(flip ? 0 : 1, 0)
+				.setOverlay(overlay)
+				.setLight(light)
+				.setNormal(pose, nx, ny, nz);
 
-		vcons.vertex(pose, 0, h, 0)
-				.color(255, 255, 255, 255)
-				.uv(flip ? 0 : 1, 1)
-				.overlayCoords(overlay)
-				.uv2(light)
-				.normal(normal, nx, ny, nz)
-				.endVertex();
+		vcons.addVertex(pose, 0, h, 0)
+				.setColor(255, 255, 255, 255)
+				.setUv(flip ? 0 : 1, 1)
+				.setOverlay(overlay)
+				.setLight(light)
+				.setNormal(pose, nx, ny, nz);
 
-		vcons.vertex(pose, w, h, 0)
-				.color(255, 255, 255, 255)
-				.uv(flip ? 1 : 0, 1)
-				.overlayCoords(overlay)
-				.uv2(light)
-				.normal(normal, nx, ny, nz)
-				.endVertex();
+		vcons.addVertex(pose, w, h, 0)
+				.setColor(255, 255, 255, 255)
+				.setUv(flip ? 1 : 0, 1)
+				.setOverlay(overlay)
+				.setLight(light)
+				.setNormal(pose, nx, ny, nz);
 
-		vcons.vertex(pose, w, 0, 0)
-				.color(255, 255, 255, 255)
-				.uv(flip ? 1 : 0, 0)
-				.overlayCoords(overlay)
-				.uv2(light)
-				.normal(normal, nx, ny, nz)
-				.endVertex();
+		vcons.addVertex(pose, w, 0, 0)
+				.setColor(255, 255, 255, 255)
+				.setUv(flip ? 1 : 0, 0)
+				.setOverlay(overlay)
+				.setLight(light)
+				.setNormal(pose, nx, ny, nz);
 	}
 
 	private static void renderWaveSimple(VertexConsumer vcons, PoseStack stack, float partialTicks, float w, float h,
@@ -202,8 +198,7 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 			stack.translate(v3f1.x() + w, v3f1.y(), v3f1.z());
 		}
 
-		Matrix4f pose = stack.last().pose();
-        Matrix3f normal = stack.last().normal();
+        PoseStack.Pose pose = stack.last();
 
 		float f = sz <= 2 ? 1 : 1f / (sz - 1);
 		float ulen = w * f;
@@ -220,55 +215,55 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 			float z1 = horizDisp[index];
 			float z2 = horizDisp[nextIndex];
 
-			vcons.vertex(pose, w1, 0, z1)
-					.color(255, 255, 255, 255)
-					.uv(u1, 0)
-					.overlayCoords(overlay)
-					.uv2(light)
-					.normal(normal, n1.x, n1.y, n1.z)
-					.endVertex();
+			vcons.addVertex(pose, w1, 0, z1)
+					.setColor(255, 255, 255, 255)
+					.setUv(u1, 0)
+					.setOverlay(overlay)
+					.setLight(light)
+					.setNormal(pose, n1.x, n1.y, n1.z);
 
-			vcons.vertex(pose, w1, h, z1)
-					.color(255, 255, 255, 255)
-					.uv(u1, 1)
-					.overlayCoords(overlay)
-					.uv2(light)
-					.normal(normal, n1.x, n1.y, n1.z)
-					.endVertex();
+			vcons.addVertex(pose, w1, h, z1)
+					.setColor(255, 255, 255, 255)
+					.setUv(u1, 1)
+					.setOverlay(overlay)
+					.setLight(light)
+					.setNormal(pose, n1.x, n1.y, n1.z);
 
-			vcons.vertex(pose, w2, h, z2)
-					.color(255, 255, 255, 255)
-					.uv(u2, 1)
-					.overlayCoords(overlay)
-					.uv2(light)
-					.normal(normal, n2.x, n2.y, n2.z)
-					.endVertex();
+			vcons.addVertex(pose, w2, h, z2)
+					.setColor(255, 255, 255, 255)
+					.setUv(u2, 1)
+					.setOverlay(overlay)
+					.setLight(light)
+					.setNormal(pose, n2.x, n2.y, n2.z);
 
-			vcons.vertex(pose, w2, 0, z2)
-					.color(255, 255, 255, 255)
-					.uv(u2, 0)
-					.overlayCoords(overlay)
-					.uv2(light)
-					.normal(normal, n2.x, n2.y, n2.z)
-					.endVertex();
+			vcons.addVertex(pose, w2, 0, z2)
+					.setColor(255, 255, 255, 255)
+					.setUv(u2, 0)
+					.setOverlay(overlay)
+					.setLight(light)
+					.setNormal(pose, n2.x, n2.y, n2.z);
 		}
 	}
 
-	public static RenderType getFlagBuffer(ResourceLocation flagId, double distance) {
-        // Adapted from ImmersivePaintingEntityRenderer#getTexture.
+	public static ResourceLocation getFlagLocation(ResourceLocation flagId, double distance) {
+        // Adapted from ImmersivePaintingEntityRenderer#getTextureLocation.
         Minecraft mc = Minecraft.getInstance();
-        Config config = Config.getInstance();
 
         double blocksVisible = Math.tan(mc.options.fov().get() / 180.0 * Math.PI / 2.0) * 2.0 * distance;
-        int resolution = ClientPaintingManager.getPainting(flagId).resolution;
-        double pixelDensity = blocksVisible * resolution / mc.getWindow().getHeight();
 
-        Painting.Type type = pixelDensity > config.eighthResolutionThreshold ? Painting.Type.EIGHTH
-            : pixelDensity > config.quarterResolutionThreshold ? Painting.Type.QUARTER
-            : pixelDensity > config.halfResolutionThreshold ? Painting.Type.HALF
-            : Painting.Type.FULL;
+        Optional<Painting> painting = ClientPaintingManager.getPainting(flagId);
+        if (painting.isEmpty())
+            return ClientPaintingManager.getImageIdentifier(BetsyRoss.DEFAULT_FLAG, Painting.Size.FULL);
 
-		return RenderType.entityTranslucentCull(ClientPaintingManager.getPaintingTexture(flagId, type).textureIdentifier);
+        double pixelDensity = blocksVisible * painting.get().resolution() / mc.getWindow().getHeight();
+
+        Painting.Size size = pixelDensity > Configs.CLIENT.thumbResolutionThreshold ? Painting.Size.THUMBNAIL
+            : pixelDensity > Configs.CLIENT.eighthResolutionThreshold ? Painting.Size.EIGHTH
+            : pixelDensity > Configs.CLIENT.quarterResolutionThreshold ? Painting.Size.QUARTER
+            : pixelDensity > Configs.CLIENT.halfResolutionThreshold ? Painting.Size.HALF
+            : Painting.Size.FULL;
+
+		return ClientPaintingManager.getImageIdentifier(flagId, size);
 	}
 
 }

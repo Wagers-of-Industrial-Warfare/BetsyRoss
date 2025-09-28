@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.conczin.immersive_paintings.registration.Configs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -46,6 +48,8 @@ import rbasamoyai.betsyross.network.ClientboundOpenFlagBlockScreenPacket;
 import rbasamoyai.betsyross.tags.BetsyRossTags;
 
 public class FlagBlock extends Block implements EntityBlock, SimpleWaterloggedBlock {
+
+    public static final MapCodec<FlagBlock> CODEC = simpleCodec(FlagBlock::new);
 
     public static final IntegerProperty ROTATION = BlockStateProperties.ROTATION_16;
 
@@ -150,4 +154,5 @@ public class FlagBlock extends Block implements EntityBlock, SimpleWaterloggedBl
         return list;
     }
 
+    @Override protected MapCodec<? extends Block> codec() { return CODEC; }
 }

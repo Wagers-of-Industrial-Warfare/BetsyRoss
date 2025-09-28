@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderGetter;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -46,16 +47,16 @@ public class FlagBlockEntity extends BlockEntity {
 	public BlockState getFlagPole() { return this.flagPole; }
 
 	@Override
-	protected void saveAdditional(CompoundTag tag) {
-		super.saveAdditional(tag);
+	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.saveAdditional(tag, registries);
 		tag.putString("FlagId", this.flagId.toString());
 		if (this.flagPole != null)
             tag.put("Flagpole", NbtUtils.writeBlockState(this.flagPole));
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
-		super.load(tag);
+	public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.loadAdditional(tag, registries);
 		this.flagId = BetsyRossUtils.location(tag.getString("FlagId"));
 		HolderGetter<Block> holder = this.level == null ? BuiltInRegistries.BLOCK.asLookup() : this.level.holderLookup(Registries.BLOCK);
 		this.flagPole = NbtUtils.readBlockState(holder, tag.getCompound("Flagpole"));
@@ -67,6 +68,6 @@ public class FlagBlockEntity extends BlockEntity {
 		return ClientboundBlockEntityDataPacket.create(this);
 	}
 
-	@Override public CompoundTag getUpdateTag() { return this.saveWithoutMetadata(); }
+	@Override public CompoundTag getUpdateTag(HolderLookup.Provider registries) { return this.saveWithoutMetadata(registries); }
 
 }

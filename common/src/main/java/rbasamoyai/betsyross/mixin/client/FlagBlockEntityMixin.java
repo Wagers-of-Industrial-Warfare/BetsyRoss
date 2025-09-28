@@ -2,9 +2,9 @@ package rbasamoyai.betsyross.mixin.client;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -34,8 +34,9 @@ public abstract class FlagBlockEntityMixin extends BlockEntity implements Culled
         return this.renderBoundingBox;
     }
 
-    @Inject(method = "setFlag", at = @At("TAIL"))
-    private void betsyross$setFlag(ResourceLocation par1, CallbackInfo ci) {
+    @WrapMethod(method = "setFlag", remap = false)
+    private void betsyross$setFlag(FlagBlockEntity instance, ResourceLocation loc, Operation<Void> original) {
+        original.call(instance, loc);
         this.renderBoundingBox = null;
     }
 
