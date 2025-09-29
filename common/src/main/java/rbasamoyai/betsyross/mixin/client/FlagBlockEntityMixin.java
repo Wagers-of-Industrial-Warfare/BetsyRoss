@@ -35,8 +35,8 @@ public abstract class FlagBlockEntityMixin extends BlockEntity implements Culled
     }
 
     @WrapMethod(method = "setFlag", remap = false)
-    private void betsyross$setFlag(FlagBlockEntity instance, ResourceLocation loc, Operation<Void> original) {
-        original.call(instance, loc);
+    private void betsyross$setFlag(ResourceLocation flagId, Operation<Void> original) {
+        original.call(flagId);
         this.renderBoundingBox = null;
     }
 
