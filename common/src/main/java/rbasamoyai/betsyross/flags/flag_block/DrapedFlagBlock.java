@@ -8,10 +8,18 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.mojang.serialization.MapCodec;
 
+import net.conczin.immersive_paintings.registration.Configs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
@@ -26,9 +34,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import rbasamoyai.betsyross.network.BetsyRossNetworkHandler;
+import rbasamoyai.betsyross.network.s2c.S2COpenFlagBlockScreenPayload;
 
 public class DrapedFlagBlock extends HorizontalDirectionalBlock implements EntityBlock, SimpleWaterloggedBlock {
 
@@ -60,6 +71,18 @@ public class DrapedFlagBlock extends HorizontalDirectionalBlock implements Entit
 		BlockState state = this.defaultBlockState();
 		return state.setValue(FACING, context.getHorizontalDirection().getOpposite());
 	}
+
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (!(level.getBlockEntity(pos) instanceof FlagBlockEntity))
+            return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+        if (level.isClientSide || !(player instanceof ServerPlayer splayer) || splayer.gameMode.getGameModeForPlayer() == GameType.ADVENTURE)
+            return ItemInteractionResult.SUCCESS;
+        BetsyRossNetworkHandler.sendToClient(splayer, new S2COpenFlagBlockScreenPayload(pos,
+            Configs.COMMON.minPaintingResolution, Configs.COMMON.maxPaintingResolution,
+            Configs.COMMON.showOtherPlayersPaintings, Configs.COMMON.uploadPermissionLevel));
+        return ItemInteractionResult.CONSUME;
+    }
 
 	@Nullable
 	@Override
