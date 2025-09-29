@@ -40,5 +40,5 @@
   "config.betsyross.server.bannerStandardMaxHeight": "Maximum Height for Banner Standard",
   "config.betsyross.server.bannerStandardMaxHeight.desc": "Maximum height allowed when setting a banner standard. Set to 0 to disable the maximum limit.",
 
-  "tooltip.betsyross.flag_id": "Flag: %s"
+  "tag.item.betsyross.flag_stick_material": "Flag Sticks"
 }
