@@ -129,7 +129,7 @@ public class BetsyRossClient {
     }
 
     public static FlagRenderInfo getFlagRenderInfo(ResourceLocation location) {
-        Optional<Painting> paintingOp = ClientPaintingManager.getPainting(BetsyRoss.DEFAULT_FLAG);
+        Optional<Painting> paintingOp = ClientPaintingManager.getPainting(location);
         if (paintingOp.isPresent()) {
             Painting painting = paintingOp.get();
             return new FlagRenderInfo(location, painting.width(), painting.height());
