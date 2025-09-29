@@ -51,9 +51,6 @@ dependencies {
 
     // Trinkets and CCA
     modImplementation("dev.emi:trinkets:${trinkets_fabric_version}")
-//    modCompileOnly("dev.emi:trinkets:${trinkets_fabric_version}") { exclude(group: "com.terraformersmc") }
-//    modCompileOnly("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${cca_fabric_version}")
-//    modCompileOnly("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${cca_fabric_version}")
 
     // WebP library for Immersive Paintings, not needed for compile time
     runtimeOnly("com.twelvemonkeys.common:common-lang:${webp_version}")
