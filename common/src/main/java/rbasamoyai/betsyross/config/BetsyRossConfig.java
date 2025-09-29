@@ -12,7 +12,7 @@ public class BetsyRossConfig {
     public static final String CONFIG_ID = "config." + BetsyRoss.MOD_ID + ".";
 
     public static final CfgClient CLIENT = register(CfgClient::new, RegisterType.CLIENT);
-    public static final CfgServer SERVER = register(CfgServer::new, RegisterType.SERVER);
+    public static final CfgServer SERVER = register(CfgServer::new, RegisterType.BOTH);
 
     public static void init() {}
 

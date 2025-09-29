@@ -12,6 +12,6 @@ public class CfgClient extends Config {
         super(BetsyRoss.path("client_config"));
     }
 
-	public final FlagAnimationDetail animationDetail = FlagAnimationDetail.WAVE;
+	public FlagAnimationDetail animationDetail = FlagAnimationDetail.WAVE;
 
 }

@@ -5,10 +5,15 @@
 
   "name": "Betsy Ross",
   "description": "${description}",
-  "authors": [],
-  "contact": {},
+  "authors": [
+    "rbasamoyai"
+  ],
+  "contact": {
+    "sources": "${mod_sources}",
+    "issues": "${mod_issues}"
+  },
 
-  "license": "MIT",
+  "license": "${license}",
   "icon": "logo.png",
 
   "environment": "*",
@@ -34,5 +39,10 @@
   },
   "breaks": {
     "trinkets": "<${trinkets_breaking}"
+  },
+  "custom": {
+    "fzzy_config": [
+      "${mod_id}"
+    ]
   }
 }
