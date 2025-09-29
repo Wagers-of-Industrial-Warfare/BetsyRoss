@@ -3,13 +3,15 @@
   "category": "building",
   "key": {
     "B": { "tag": "minecraft:banners" },
-    "S": { "tag": "betsyross:flag_stick_material"}
+    "P": { "tag": "minecraft:planks" }
   },
   "pattern": [
-    "SB",
-    "S "
+    "BB",
+    "PP",
+    "PP"
   ],
   "result": {
-    "item": "betsyross:flag_standard"
+    "count": 1,
+    "id": "betsyross:embroidery_table"
   }
 }

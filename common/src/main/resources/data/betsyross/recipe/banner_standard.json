@@ -6,10 +6,12 @@
     "S": { "tag": "betsyross:flag_stick_material"}
   },
   "pattern": [
-    "BS",
-    " S"
+    "B",
+    "S",
+    "S"
   ],
   "result": {
-    "item": "betsyross:flag_standard"
+    "count": 1,
+    "id": "betsyross:banner_standard"
   }
 }

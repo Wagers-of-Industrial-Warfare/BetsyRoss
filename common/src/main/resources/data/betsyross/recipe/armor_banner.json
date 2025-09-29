@@ -3,14 +3,15 @@
   "category": "building",
   "key": {
     "B": { "tag": "minecraft:banners" },
-    "S": { "tag": "betsyross:flag_stick_material"},
-    "T": { "item": "minecraft:string"}
+    "S": { "tag": "betsyross:flag_stick_material" },
+    "T": { "item": "minecraft:string" }
   },
   "pattern": [
     " B ",
     "TST"
   ],
   "result": {
-    "item": "betsyross:armor_banner"
+    "count": 1,
+    "id": "betsyross:armor_banner"
   }
 }
