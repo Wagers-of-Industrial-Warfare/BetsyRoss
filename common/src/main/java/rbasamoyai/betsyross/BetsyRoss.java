@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 
+import net.conczin.immersive_paintings.Main;
 import net.minecraft.resources.ResourceLocation;
 import rbasamoyai.betsyross.config.BetsyRossConfig;
 import rbasamoyai.betsyross.foundation.BetsyRossUtils;
@@ -13,7 +14,7 @@ public class BetsyRoss {
 	public static final String MOD_ID = "betsyross";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public static final ResourceLocation DEFAULT_FLAG = path("paintings/default_flag.png");
+    public static final ResourceLocation DEFAULT_FLAG = Main.locate("datapack/betsyrosspaintingsdefaultflagpng");
 
     public static void init() {
         BetsyRossConfig.init();
