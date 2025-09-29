@@ -134,6 +134,8 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
 
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
+
         switch (this.page) {
             case NEW -> {
                 context.fill(this.width / 2 - 115, this.height / 2 - 68, this.width / 2 + 115, this.height / 2 - 41, 0x50000000);
@@ -193,7 +195,6 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
                 context.drawCenteredString(this.font, text, this.width / 2, this.height / 2, 0xFFFFFFFF);
             }
         }
-        super.render(context, mouseX, mouseY, delta);
     }
 
     private void pixellateImage() {
