@@ -92,9 +92,12 @@ processResources {
 //            'forge_loader_version_range'   : forge_loader_version_range,
         'credits'                      : credits,
         'java_version'                 : java_version,
-        immersive_paintings_fabric_requirement: immersive_paintings_fabric_requirement,
-        fzzy_config_fabric_requirement: fzzy_config_fabric_requirement,
-        trinkets_breaking: trinkets_requirement
+        'immersive_paintings_fabric_requirement': immersive_paintings_fabric_requirement,
+        'immersive_paintings_neoforge_requirement': immersive_paintings_neoforge_requirement,
+        'fzzy_config_fabric_requirement': fzzy_config_fabric_requirement,
+        'fzzy_config_neoforge_requirement': fzzy_config_neoforge_requirement,
+        'trinkets_breaking': trinkets_requirement,
+        'curios_recommendation': curios_requirement
     ]
 
     filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {

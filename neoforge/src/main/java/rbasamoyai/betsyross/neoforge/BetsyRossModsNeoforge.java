@@ -1,11 +1,11 @@
-package rbasamoyai.betsyross.forge;
+package rbasamoyai.betsyross.neoforge;
 
 import java.util.Locale;
 import java.util.function.Supplier;
 
-import net.minecraftforge.fml.ModList;
+import net.neoforged.fml.ModList;
 
-public enum BetsyRossModsForge {
+public enum BetsyRossModsNeoforge {
 	CURIOS;
 
 	private final String id = this.name().toLowerCase(Locale.ROOT);

@@ -1,0 +1,73 @@
+plugins {
+    id "multiloader-loader"
+    id "net.neoforged.moddev"
+}
+
+// Kotlin?
+
+neoForge {
+    version = neoforge_version
+
+    // Automatically enable neoforge AccessTransformers if the file exists
+    def at = project(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
+    if (at.exists()) {
+        accessTransformers.add(at.absolutePath)
+    }
+
+    parchment {
+        minecraftVersion = minecraft_version
+        mappingsVersion = parchment_version
+    }
+
+    runs {
+        configureEach {
+            systemProperty('neoforge.enabledGameTestNamespaces', mod_id)
+            ideName = "NeoForge ${it.name.capitalize()} (${project.path})" // Unify the run config names with fabric
+
+            def dir = project.getLayout().getProjectDirectory().dir('run/' + it.name)
+            if (!dir.asFile.exists()) {
+                dir.asFile.mkdir()
+            }
+            getGameDirectory().convention(dir)
+        }
+        client {
+            client()
+        }
+        data {
+            data()
+        }
+        server {
+            server()
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+repositories {
+    maven { // Curios
+        name = "Illusive Soulworks maven"
+        url = "https://maven.theillusivec4.top/"
+    }
+    maven { url = "https://thedarkcolour.github.io/KotlinForForge/" } // For Fzzy Config
+}
+
+dependencies {
+    implementation("curse.maven:immersive-paintings-639584:${immersive_paintings_neoforge_file}")
+
+    implementation("me.fzzyhmstrs:fzzy_config:${fzzy_config_version}+neoforge")
+
+    // Curios
+    compileOnly("top.theillusivec4.curios:curios-neoforge:${curios_neoforge_version}:api")
+    runtimeOnly("top.theillusivec4.curios:curios-neoforge:${curios_neoforge_version}")
+
+    // WebP library for Immersive Paintings, not needed for compile time
+    runtimeOnly("com.twelvemonkeys.common:common-lang:${webp_version}")
+    runtimeOnly("com.twelvemonkeys.common:common-image:${webp_version}")
+    runtimeOnly("com.twelvemonkeys.imageio:imageio-core:${webp_version}")
+    runtimeOnly("com.twelvemonkeys.imageio:imageio-webp:${webp_version}")
+}
