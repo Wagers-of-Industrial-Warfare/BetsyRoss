@@ -50,22 +50,22 @@ public class FlagStandardRenderer extends BlockEntityWithoutLevelRenderer {
         FlagAnimationDetail detail = BetsyRossConfig.CLIENT.animationDetail;
         float pt = mc.getTimer().getGameTimeDeltaPartialTick(true);
 
-		if (transform == ItemDisplayContext.GUI) {
-			width = 1;
-			height = 1;
-			detail = FlagAnimationDetail.NO_WAVE;
-			pt = 1.0f;
-		} else {
+//		if (transform == ItemDisplayContext.GUI) {
+//			width = 1;
+//			height = 1;
+//			detail = FlagAnimationDetail.NO_WAVE;
+//			pt = 1.0f;
+//		} else {
 			this.flagpole.render(posestack, STANDARD_FLAGPOLE.buffer(buffers, RenderType::entitySolid), light, overlay);
 			posestack.translate(.5, 3, 0);
-		}
+//		}
 
-		float dir = transform == ItemDisplayContext.GUI ? 90 : 0;
+		//float dir = transform == ItemDisplayContext.GUI ? 90 : 0;
 
 		posestack.translate(0, 1, 0.5);
 
-		renderFullTexture(renderInfo.location(), 0, width, height, pt, dir, posestack, buffers, light, overlay, false, detail, true);
-		renderFullTexture(renderInfo.location(), 0, width, height, pt, dir, posestack, buffers, light, overlay, true, detail, true);
+		renderFullTexture(renderInfo.location(), 0, width, height, pt, 0, posestack, buffers, light, overlay, false, detail, true);
+		renderFullTexture(renderInfo.location(), 0, width, height, pt, 0, posestack, buffers, light, overlay, true, detail, true);
 
 		posestack.popPose();
 	}
