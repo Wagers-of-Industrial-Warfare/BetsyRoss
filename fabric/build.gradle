@@ -39,6 +39,8 @@ dependencies {
     modCompileOnly("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${cca_fabric_version}")
     modCompileOnly("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${cca_fabric_version}")
 
+    modImplementation("com.terraformersmc:modmenu:${modmenu_fabric_version}")
+
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
 }
 
