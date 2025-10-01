@@ -546,7 +546,7 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
     }
 
     /**
-     * Copied from {@link ImmersivePaintingScreen#consolidate(List)}
+     * Copied from {@link ImmersivePaintingScreen#updateWidget(ResourceLocation)}
      */
     public void updateWidget(ResourceLocation paintingLoc) {
         if (this.paintingWidgets.containsKey(paintingLoc)) {

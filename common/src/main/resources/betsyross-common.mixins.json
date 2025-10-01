@@ -8,6 +8,7 @@
   "client": [
     "client.ArmorStandRendererMixin",
     "client.BlockEntityWithoutLevelRendererMixin",
+    "client.ClientPaintingManagerMixin",
     "client.CustomHeadLayerMixin",
     "client.FlagBlockEntityMixin",
     "client.GuiGraphicsMixin",
