@@ -5,8 +5,13 @@
 
   "name": "Betsy Ross",
   "description": "Large flags with images across the internets",
-  "authors": [],
-  "contact": {},
+  "authors": [
+    "rbasamoyai"
+  ],
+  "contact": {
+    "sources": "https://github.com/Wagers-of-Industrial-Warfare/BetsyRoss",
+    "issues": "https://github.com/Wagers-of-Industrial-Warfare/BetsyRoss/issues"
+  },
 
   "license": "MIT",
   "icon": "logo.png",
