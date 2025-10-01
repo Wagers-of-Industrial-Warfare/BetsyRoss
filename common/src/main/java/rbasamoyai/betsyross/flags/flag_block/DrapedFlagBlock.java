@@ -7,10 +7,17 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
+import immersive_paintings.Config;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
@@ -25,9 +32,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import rbasamoyai.betsyross.network.BetsyRossNetwork;
+import rbasamoyai.betsyross.network.ClientboundOpenFlagBlockScreenPacket;
 
 public class DrapedFlagBlock extends HorizontalDirectionalBlock implements EntityBlock, SimpleWaterloggedBlock {
 
@@ -87,6 +97,18 @@ public class DrapedFlagBlock extends HorizontalDirectionalBlock implements Entit
 				? Blocks.AIR.defaultBlockState()
 				: super.updateShape(state, dir, otherState, level, pos, otherPos);
 	}
+
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (!(level.getBlockEntity(pos) instanceof FlagBlockEntity))
+            return super.use(state, level, pos, player, hand, hit);
+        if (level.isClientSide || !(player instanceof ServerPlayer splayer) || splayer.gameMode.getGameModeForPlayer() == GameType.ADVENTURE)
+            return InteractionResult.SUCCESS;
+        Config config = Config.getInstance();
+        BetsyRossNetwork.sendToPlayer(splayer, new ClientboundOpenFlagBlockScreenPacket(pos, config.minPaintingResolution,
+            config.maxPaintingResolution, config.showOtherPlayersPaintings, config.uploadPermissionLevel));
+        return InteractionResult.CONSUME;
+    }
 
     @Override
     public boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
