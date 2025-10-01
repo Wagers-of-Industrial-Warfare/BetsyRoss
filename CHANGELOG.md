@@ -1,5 +1,15 @@
 # Changelog
 
+2.1.0 (1.20.1) and 3.0.0 (1.21.1)
+--
+**Changes**
+- [v3.0.0] Flags now use data components instead of NBT data
+- [v3.0.0] Flags now support Immersive Paintings' NSFW blur and config
+
+**Fixed**
+- Fixed draped flag block not allowing to set flag image
+- Fixed lighting and positioning of flag on flag standard and banner standard items
+
 2.0.1
 ---
 **Fixed**
