@@ -112,9 +112,9 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 	}
 
 	private static void renderSimple(VertexConsumer vcons, PoseStack stack, int w, int h, int light, int overlay, boolean flip, boolean isItem) {
-		float nx = 0;
-		float ny = isItem ? 1 : 0;
-		float nz = isItem ? 0 : flip ? 1 : -1;
+        float nx = 0;
+        float ny = 0;
+        float nz = flip ? 1 : -1;
 
 		if (!flip) {
 			Vector3f v3f1 = new Vector3f(0, 0, 0);
@@ -125,7 +125,7 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 		}
 
 		Matrix4f pose = stack.last().pose();
-        Matrix3f normal = isItem ? new Matrix3f() : stack.last().normal();
+        Matrix3f normal = stack.last().normal();
 
 		vcons.vertex(pose, 0, 0, 0)
 				.color(255, 255, 255, 255)
