@@ -16,24 +16,24 @@ public class CfgServer extends Config {
     public int flagBlockMaxWidth = 0;
 
 	@ValidatedInt.Restrict(min = 0, max = Byte.MAX_VALUE)
-    public int flagBlockMaxHeight;
+    public int flagBlockMaxHeight = 0;
 
     @ValidatedInt.Restrict(min = 0, max = Byte.MAX_VALUE)
-	public int armorBannerMaxWidth;
+	public int armorBannerMaxWidth = 1;
 
     @ValidatedInt.Restrict(min = 0, max = Byte.MAX_VALUE)
-	public int armorBannerMaxHeight;
+	public int armorBannerMaxHeight = 2;
 
     @ValidatedInt.Restrict(min = 0, max = Byte.MAX_VALUE)
-	public int flagStandardMaxWidth;
+	public int flagStandardMaxWidth = 4;
 
     @ValidatedInt.Restrict(min = 0, max = Byte.MAX_VALUE)
-	public int flagStandardMaxHeight;
+	public int flagStandardMaxHeight = 2;
 
     @ValidatedInt.Restrict(min = 0, max = Byte.MAX_VALUE)
-	public int bannerStandardMaxWidth;
+	public int bannerStandardMaxWidth = 2;
 
     @ValidatedInt.Restrict(min = 0, max = Byte.MAX_VALUE)
-	public int bannerStandardMaxHeight;
+	public int bannerStandardMaxHeight = 3;
 
 }
