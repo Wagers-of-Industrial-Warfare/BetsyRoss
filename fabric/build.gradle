@@ -29,9 +29,9 @@ dependencies {
 
     modImplementation("curse.maven:immersive-paintings-639584:${immersive_paintings_fabric_file}")
 
-    modApi(include("curse.maven:forge-config-api-port-fabric-547434:${config_api_id}"))
-    modApi(include("com.electronwill.night-config:core:${night_config_version}"))
-    modApi(include("com.electronwill.night-config:toml:${night_config_version}"))
+    modApi("curse.maven:forge-config-api-port-fabric-547434:${config_api_id}")
+    modApi("com.electronwill.night-config:core:${night_config_version}")
+    modApi("com.electronwill.night-config:toml:${night_config_version}")
 
     // Trinkets and CCA
     modLocalRuntime("dev.emi:trinkets:${trinkets_fabric_version}")
