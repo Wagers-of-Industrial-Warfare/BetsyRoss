@@ -5,6 +5,7 @@
 **Changes**
 - [v3.0.0] Flags now use data components instead of NBT data
 - [v3.0.0] Flags now support Immersive Paintings' NSFW blur and config
+- [v2.1.0 Fabric] The mod now requires Fabric Config API Port to be downloaded separately
 
 **Fixed**
 - Fixed draped flag block not allowing to set flag image
