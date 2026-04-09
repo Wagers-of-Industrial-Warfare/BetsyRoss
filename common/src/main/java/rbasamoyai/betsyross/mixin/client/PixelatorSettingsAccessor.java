@@ -10,7 +10,7 @@ import immersive_paintings.resources.ByteImage;
 public interface PixelatorSettingsAccessor {
 
     @Invoker("<init>")
-    static ImmersivePaintingScreen.PixelatorSettings callInit(ByteImage byteImage) {
+    static ImmersivePaintingScreen.PixelatorSettings callInit(ByteImage byteImage, int maxResolution) {
         throw new AssertionError();
     }
 

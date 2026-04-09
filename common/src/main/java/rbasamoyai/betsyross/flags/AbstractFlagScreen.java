@@ -581,7 +581,7 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
                         if (this.currentImage != null) {
                             currentImagePixelZoomCache = -1;
                             this.currentImageName = file.getName();
-                            this.settings = PixelatorSettingsAccessor.callInit(this.currentImage);
+                            this.settings = PixelatorSettingsAccessor.callInit(this.currentImage, this.maxResolution);
                             this.setPage(Page.CREATE);
                             this.pixelateImage();
                         }
@@ -683,7 +683,7 @@ public abstract class AbstractFlagScreen extends Screen implements BetsyRossFlag
         currentImagePixelZoomCache = -1;
         if (this.currentImage != null) {
             this.currentImageName = FilenameUtils.getBaseName(path).replaceFirst("[.][^.]+$", "");
-            this.settings = PixelatorSettingsAccessor.callInit(this.currentImage);
+            this.settings = PixelatorSettingsAccessor.callInit(this.currentImage, this.maxResolution);
             this.setPage(Page.CREATE);
             this.pixelateImage();
         }
