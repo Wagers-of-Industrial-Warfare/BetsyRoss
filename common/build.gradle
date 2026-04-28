@@ -4,6 +4,10 @@ plugins {
 }
 
 repositories {
+    maven {
+        name = "Fuzs Mod Resources"
+        url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
+    }
 }
 
 dependencies {
@@ -18,6 +22,8 @@ dependencies {
 
     modImplementation("me.fzzyhmstrs:fzzy_config:${fzzy_config_version}")
     modImplementation("curse.maven:immersive-paintings-639584:${immersive_paintings_fabric_file}")
+
+    api("dev.ryanhcode.sable:sable-common-${minecraft_version}:${sable_version}") // Sable
 
     annotationProcessor(implementation("io.github.llamalad7:mixinextras-common:${mixinextras_version}")) // MixinExtras
 

@@ -54,6 +54,9 @@ repositories {
         url = "https://maven.theillusivec4.top/"
     }
     maven { url = "https://thedarkcolour.github.io/KotlinForForge/" } // For Fzzy Config
+    maven { url = "https://maven.createmod.net" } // Create (required by Sable)
+    maven { url = "https://maven.ithundxr.dev/snapshots" } // Registrate (required by Sable)
+    maven { url = "https://maven.realrobotix.me/master" } // Registrate
 }
 
 dependencies {
@@ -64,6 +67,11 @@ dependencies {
     // Curios
     compileOnly("top.theillusivec4.curios:curios-neoforge:${curios_neoforge_version}:api")
     runtimeOnly("top.theillusivec4.curios:curios-neoforge:${curios_neoforge_version}")
+
+    // Sable
+    api("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:${sable_version}")
+    compileOnly("com.simibubi.create:create-${minecraft_version}:${create_neoforge_version}:slim") { transitive = false }
+    compileOnly("com.tterrag.registrate:Registrate:${registrate_neoforge_version}")
 
     // WebP library for Immersive Paintings, not needed for compile time
     runtimeOnly("com.twelvemonkeys.common:common-lang:${webp_version}")

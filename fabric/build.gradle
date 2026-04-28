@@ -32,6 +32,10 @@ loom {
 repositories {
     maven { url = "https://maven.terraformersmc.com/releases/" } // Trinkets
     maven { url = "https://maven.ladysnake.org/releases" } // CCA (for Trinkets)
+    maven {
+        name = "Fuzs Mod Resources"
+        url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
+    }
 }
 
 dependencies {
@@ -51,6 +55,9 @@ dependencies {
 
     // Trinkets and CCA
     modImplementation("dev.emi:trinkets:${trinkets_fabric_version}")
+
+    // Sable
+    modApi("dev.ryanhcode.sable:sable-fabric-${minecraft_version}:${sable_version}")
 
     // WebP library for Immersive Paintings, not needed for compile time
     runtimeOnly("com.twelvemonkeys.common:common-lang:${webp_version}")

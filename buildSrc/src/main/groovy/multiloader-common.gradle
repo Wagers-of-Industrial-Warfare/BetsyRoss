@@ -38,6 +38,18 @@ repositories {
         name = "CurseMaven"
         url = "https://cursemaven.com"
     }
+    exclusiveContent { // Sable
+        forRepository {
+            maven {
+                url = "https://maven.ryanhcode.dev/releases"
+                name = "RyanHCode Maven"
+            }
+        }
+        filter {
+            includeGroup("dev.ryanhcode.sable")
+            includeGroup("dev.ryanhcode.sable-companion")
+        }
+    }
 }
 
 // Declare capabilities on the outgoing configurations.
