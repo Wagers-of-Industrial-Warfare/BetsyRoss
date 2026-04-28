@@ -54,9 +54,6 @@ repositories {
         url = "https://maven.theillusivec4.top/"
     }
     maven { url = "https://thedarkcolour.github.io/KotlinForForge/" } // For Fzzy Config
-    maven { url = "https://maven.createmod.net" } // Create (required by Sable)
-    maven { url = "https://maven.ithundxr.dev/snapshots" } // Registrate (required by Sable)
-    maven { url = "https://maven.realrobotix.me/master" } // Registrate
 }
 
 dependencies {
@@ -69,9 +66,13 @@ dependencies {
     runtimeOnly("top.theillusivec4.curios:curios-neoforge:${curios_neoforge_version}")
 
     // Sable
-    api("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:${sable_version}")
-    compileOnly("com.simibubi.create:create-${minecraft_version}:${create_neoforge_version}:slim") { transitive = false }
-    compileOnly("com.tterrag.registrate:Registrate:${registrate_neoforge_version}")
+    api("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:${sable_version}") {
+        // Bunch of required groups we need to exclude
+        exclude(group: "com.simibubi.create", module: "create-${minecraft_version}")
+        exclude(group: "net.createmod.ponder", module: "ponder-neoforge")
+        exclude(group: "dev.engine-room.flywheel", module: "flywheel-neoforge-${minecraft_version}")
+        exclude(group: "com.tterrag.registrate", module: "Registrate")
+    }
 
     // WebP library for Immersive Paintings, not needed for compile time
     runtimeOnly("com.twelvemonkeys.common:common-lang:${webp_version}")

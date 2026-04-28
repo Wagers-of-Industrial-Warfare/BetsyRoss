@@ -109,7 +109,8 @@ processResources {
         'fzzy_config_fabric_requirement': fzzy_config_fabric_requirement,
         'fzzy_config_neoforge_requirement': fzzy_config_neoforge_requirement,
         'trinkets_breaking': trinkets_requirement,
-        'curios_recommendation': curios_requirement
+        'curios_recommendation': curios_requirement,
+        'sable_recommendation': sable_requirement,
     ]
 
     filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {

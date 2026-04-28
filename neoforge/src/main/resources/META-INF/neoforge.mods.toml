@@ -57,3 +57,10 @@ type = "optional"
 versionRange = "[${curios_recommendation},)"
 ordering = "BEFORE"
 side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "sable"
+type = "optional"
+versionRange = "[${sable_recommendation},)"
+ordering = "BEFORE"
+side = "BOTH"
