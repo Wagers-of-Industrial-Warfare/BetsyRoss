@@ -261,4 +261,6 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 		return ClientPaintingManager.getImageIdentifier(flagId, size);
 	}
 
+    @Override public int getViewDistance() { return 384; }
+
 }
