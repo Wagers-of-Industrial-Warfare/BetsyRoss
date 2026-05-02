@@ -1,6 +1,6 @@
 # Changelog
 
-2.1.1 and 3.1.1 (1.21.1)
+2.1.2 and 3.1.1 (1.21.1)
 ---
 **Changes**
 - Increased rendering range of Flag block
@@ -9,6 +9,12 @@
 ---
 **Changes**
 - The mod now supports rendering on Sable sublevels (Create Aeronautics).
+
+2.1.1 (1.20.1)
+---
+**Changes**
+- Betsy Ross now requires Immersive Paintings v0.6.11.
+- Implemented Immersive Paintings v0.6.11 fix to account for maximum resolution
 
 2.1.0 (1.20.1) and 3.0.0 (1.21.1)
 ---
