@@ -1,5 +1,15 @@
 # Changelog
 
+2.1.2 and 3.1.1 (1.21.1)
+---
+**Changes**
+- Increased rendering range of Flag block
+
+3.1.0 (1.21.1)
+---
+**Changes**
+- The mod now supports rendering on Sable sublevels (Create Aeronautics).
+
 2.1.1 (1.20.1)
 ---
 **Changes**

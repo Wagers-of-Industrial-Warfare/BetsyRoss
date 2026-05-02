@@ -271,4 +271,6 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 		return RenderType.entityTranslucentCull(ClientPaintingManager.getPaintingTexture(flagId, type).textureIdentifier);
 	}
 
+    @Override public int getViewDistance() { return 384; }
+
 }
