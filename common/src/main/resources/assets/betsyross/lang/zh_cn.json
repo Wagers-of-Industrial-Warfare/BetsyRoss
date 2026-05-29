@@ -1,0 +1,44 @@
+{
+  "itemGroup.betsyross": "Betsy Ross",
+
+  "item.betsyross.flag_standard": "标准旗杆",
+  "item.betsyross.banner_standard": "横幅旗杆",
+  "item.betsyross.armor_banner": "迷你旗杆",
+  "item.betsyross.logo_flag": "旗帜",
+
+  "block.betsyross.flag_block": "自定义旗帜",
+  "block.betsyross.flag_block.tooltip.width": "宽度：%s 格",
+  "block.betsyross.flag_block.tooltip.height": "高度：%s 格",
+  "block.betsyross.embroidery_table": "绣花桌",
+
+  "gui.betsyross.embroidery_table.invalid_flag": "在世界中放置旗帜",
+  "gui.betsyross.embroidery_table.invalid_item": "使用绣花桌打开旗杆",
+
+  "gui.betsyross.flag_maker.too_wide": "旗帜宽度不能超过 %s 格",
+  "gui.betsyross.flag_maker.too_tall": "旗帜高度不能超过 %s 格",
+
+  "config.betsyross.client": "客户端配置",
+  "config.betsyross.client.animationDetail": "旗帜动画细节",
+  "config.betsyross.client.animationDetail.desc": "旗帜使用的动画细节等级。仅适用于旗帜方块和标准旗杆。",
+  "config.betsyross.client.animationDetail.WAVE": "飘动",
+  "config.betsyross.client.animationDetail.NO_WAVE": "不飘动",
+  "config.betsyross.server": "服务端配置",
+  "config.betsyross.server.flagBlockMaxWidth": "旗帜方块最大宽度",
+  "config.betsyross.server.flagBlockMaxWidth.desc": "设置旗帜方块时允许的最大宽度。设置为 0 以禁用最大限制。",
+  "config.betsyross.server.flagBlockMaxHeight": "旗帜方块最大高度",
+  "config.betsyross.server.flagBlockMaxHeight.desc": "设置旗帜方块时允许的最大高度。设置为 0 以禁用最大限制。",
+  "config.betsyross.server.armorBannerMaxWidth": "迷你旗杆最大宽度",
+  "config.betsyross.server.armorBannerMaxWidth.desc": "设置迷你旗杆时允许的最大宽度。设置为 0 以禁用最大限制。",
+  "config.betsyross.server.armorBannerMaxHeight": "迷你旗杆最大高度",
+  "config.betsyross.server.armorBannerMaxHeight.desc": "设置迷你旗杆时允许的最大高度。设置为 0 以禁用最大限制。",
+  "config.betsyross.server.flagStandardMaxWidth": "标准旗杆最大宽度",
+  "config.betsyross.server.flagStandardMaxWidth.desc": "设置标准旗杆时允许的最大宽度。设置为 0 以禁用最大限制。",
+  "config.betsyross.server.flagStandardMaxHeight": "标准旗杆最大高度",
+  "config.betsyross.server.flagStandardMaxHeight.desc": "设置标准旗杆时允许的最大高度。设置为 0 以禁用最大限制。",
+  "config.betsyross.server.bannerStandardMaxWidth": "横幅旗杆最大宽度",
+  "config.betsyross.server.bannerStandardMaxWidth.desc": "设置横幅旗杆时允许的最大宽度。设置为 0 以禁用最大限制。",
+  "config.betsyross.server.bannerStandardMaxHeight": "横幅旗杆最大高度",
+  "config.betsyross.server.bannerStandardMaxHeight.desc": "设置横幅旗杆时允许的最大高度。设置为 0 以禁用最大限制。",
+
+  "tag.item.betsyross.flag_stick_material": "旗杆材料"
+}
