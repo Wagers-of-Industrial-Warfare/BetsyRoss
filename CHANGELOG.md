@@ -3,6 +3,7 @@
 3.1.2 (1.21.1)
 ---
 **Fixes**
+- Fixed missing new item button on embroidery screen
 
 2.1.2 and 3.1.1 (1.21.1)
 ---

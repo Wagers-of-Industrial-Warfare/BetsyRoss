@@ -22,7 +22,7 @@ public record S2COpenEmbroideryTableScreenPayload(int slot, int minResolution, i
         ByteBufCodecs.VAR_INT, S2COpenEmbroideryTableScreenPayload::minResolution,
         ByteBufCodecs.VAR_INT, S2COpenEmbroideryTableScreenPayload::maxResolution,
         ByteBufCodecs.BOOL, S2COpenEmbroideryTableScreenPayload::showOtherPlayerPaintings,
-        ByteBufCodecs.VAR_INT, S2COpenEmbroideryTableScreenPayload::slot,
+        ByteBufCodecs.VAR_INT, S2COpenEmbroideryTableScreenPayload::permissionLevel,
         S2COpenEmbroideryTableScreenPayload::new);
 
     @Override
