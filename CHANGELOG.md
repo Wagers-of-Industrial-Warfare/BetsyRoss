@@ -2,6 +2,9 @@
 
 3.1.2 (1.21.1)
 ---
+**Changes**
+- Minimum Sable compat version is now 2.0.0
+
 **Fixes**
 - Fixed missing new item button on embroidery screen
 
